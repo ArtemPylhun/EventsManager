@@ -1,10 +1,15 @@
-﻿namespace Domain.Tags;
+﻿using Domain.Events;
+using Domain.EventsTags;
+
+namespace Domain.Tags;
 
 public class Tag
 {
     public TagId Id { get;}
     
-    public string Title { get; set; }
+    public string Title { get; private set; }
+    
+    public ICollection<EventTag> EventsTag { get; set; } = new List<EventTag>();
 
     private Tag(TagId id, string title)
     {

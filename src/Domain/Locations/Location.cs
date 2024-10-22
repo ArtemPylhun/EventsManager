@@ -3,11 +3,11 @@
 public class Location
 {
     public LocationId Id { get; }
-    public string Name { get; set; }
-    public string Address { get; set; }
-    public string City { get; set; }
-    public string Country  { get; set; }
-    public int Capacity { get; set; }
+    public string Name { get; private set; }
+    public string Address { get; private set; }
+    public string City { get; private set; }
+    public string Country  { get; private set; }
+    public int Capacity { get; private set; }
 
     private Location(LocationId id, string name, string address, string city, string country, int capacity)
     {
