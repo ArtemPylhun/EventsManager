@@ -38,11 +38,9 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             .HasForeignKey(x => x.CategoryId)
             .HasConstraintName("fk_events_categories_id")
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasMany(x => x.EventsTags)
             .WithOne(et => et.Event)
-            .HasForeignKey(et => et.EventId)
-            .HasConstraintName("fk_events_events_tags_id")
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(et => et.EventId);
     }
 }
