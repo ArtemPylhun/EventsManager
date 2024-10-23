@@ -1,4 +1,5 @@
-﻿using Domain.Categories;
+﻿using Domain.Attendances;
+using Domain.Categories;
 using Domain.EventsTags;
 using Domain.Locations;
 using Domain.Tags;
@@ -22,6 +23,8 @@ public class Event
 
     public ICollection<EventTag> EventsTags { get; set; } = new List<EventTag>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+    public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
     private Event( string title, string description, DateTime startDate, DateTime endDate, UserId organizerId, LocationId locationId, CategoryId categoryId)
     {
