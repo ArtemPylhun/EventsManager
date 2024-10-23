@@ -1,4 +1,5 @@
-﻿using Domain.Profiles;
+﻿using Domain.Attendances;
+using Domain.Profiles;
 using Domain.Roles;
 
 namespace Domain.Users;
@@ -14,6 +15,8 @@ public class User
     public Role? Role { get; }
     public ProfileId ProfileId { get; }
     public Profile? Profile { get; }
+
+    public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
     private User(UserId userId, string userName, string email, string passwordHash, DateTime registeredOn, RoleId roleId, ProfileId profileId)
     {
