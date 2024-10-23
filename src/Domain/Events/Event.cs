@@ -21,7 +21,8 @@ public class Event
     public CategoryId CategoryId { get; }
     public Category? Category { get; }
 
-    public ICollection<EventTag> EventTags { get; set; } = new List<EventTag>();
+    public ICollection<EventTag> EventsTags { get; set; } = new List<EventTag>();
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 
     public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
