@@ -9,7 +9,8 @@ public class Tag
     
     public string Title { get; private set; }
     
-    public ICollection<EventTag> EventsTag { get; set; } = new List<EventTag>();
+    public ICollection<EventTag> EventsTags { get; set; } = new List<EventTag>();
+    public ICollection<Event> Events { get; set; } = new List<Event>();
 
     private Tag(TagId id, string title)
     {
