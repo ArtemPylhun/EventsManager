@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Common\Interfaces\Queries\" />
+      <Folder Include="Common\Interfaces\Repositories\" />
+    </ItemGroup>
+
 </Project>
