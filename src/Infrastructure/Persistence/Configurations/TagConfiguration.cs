@@ -14,8 +14,6 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         
         builder.HasMany(x => x.EventsTags)
             .WithOne(et => et.Tag)
-            .HasForeignKey(et => et.TagId)
-            .HasConstraintName("fk_tags_events_tags_id")
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(et => et.TagId);
     }
 }

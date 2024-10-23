@@ -18,9 +18,9 @@ public class User
 
     public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 
-    private User(UserId userId, string userName, string email, string passwordHash, DateTime registeredOn, RoleId roleId, ProfileId profileId)
+    private User(UserId id, string userName, string email, string passwordHash, DateTime registeredOn, RoleId roleId, ProfileId profileId)
     {
-        Id = userId;
+        Id = id;
         UserName = userName;
         Email = email;
         PasswordHash = passwordHash;
