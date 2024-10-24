@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
+using Domain.Events;
 using Domain.Tags;
 using Microsoft.EntityFrameworkCore;
 using Optional;
@@ -12,6 +13,17 @@ public class TagRepository(ApplicationDbContext context) : ITagRepository, ITagQ
     {
         return await context.Tags
             .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Tag>> GetByEvent(EventId eventId, CancellationToken cancellationToken)
+    {
+        var eventTags = context.EventsTags
+            .AsNoTracking()
+            .Where(et => et.EventId == eventId);
+        
+        return await context.Tags.AsNoTracking()
+            .Where(t => eventTags.Any(et => et.TagId == t.Id))
             .ToListAsync(cancellationToken);
     }
 
