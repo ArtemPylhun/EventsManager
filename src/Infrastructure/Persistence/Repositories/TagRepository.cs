@@ -24,11 +24,11 @@ public class TagRepository(ApplicationDbContext context) : ITagRepository, ITagQ
         return entity == null ? Option.None<Tag>() : Option.Some(entity);
     }
 
-    public async Task<Option<Tag>> SearchByName(string name, CancellationToken cancellationToken)
+    public async Task<Option<Tag>> SearchByTitle(string title, CancellationToken cancellationToken)
     {
         var entity = await context.Tags
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Title == name, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Title == title, cancellationToken);
         
         return entity == null ? Option.None<Tag>() : Option.Some(entity);
     }
