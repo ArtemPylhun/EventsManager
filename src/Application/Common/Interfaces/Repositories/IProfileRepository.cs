@@ -4,8 +4,8 @@ namespace Application.Common.Interfaces.Repositories;
 
 public interface IProfileRepository
 {
-    Task<Profile> Add(Profile course, CancellationToken cancellationToken);
-    Task<Profile> Update(Profile course, CancellationToken cancellationToken);
-    Task<Profile> Delete(Profile course, CancellationToken cancellationToken);
+    Task<Profile> Add(Profile profile, CancellationToken cancellationToken);
+    Task<Profile> Update(Profile profile, CancellationToken cancellationToken);
+    Task<Profile> Delete(Profile profile, CancellationToken cancellationToken);
 
 }
