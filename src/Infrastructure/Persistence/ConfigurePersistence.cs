@@ -35,6 +35,18 @@ public static class ConfigurePersistence
         services.AddScoped<ICategoryRepository>(provider => provider.GetRequiredService<CategoryRepository>());
         services.AddScoped<ICategoryQueries>(provider => provider.GetRequiredService<CategoryRepository>());
         
+        services.AddScoped<TagRepository>();
+        services.AddScoped<ITagRepository>(provider => provider.GetRequiredService<TagRepository>());
+        services.AddScoped<ITagQueries>(provider => provider.GetRequiredService<TagRepository>());
+
+        services.AddScoped<EventRepository>();
+        services.AddScoped<IEventRepository>(provider => provider.GetRequiredService<EventRepository>());
+        services.AddScoped<IEventQueries>(provider => provider.GetRequiredService<EventRepository>());
+
+        services.AddScoped<EventTagRepository>();
+        services.AddScoped<IEventTagRepository>(provider => provider.GetRequiredService<EventTagRepository>());
+        services.AddScoped<IEventTagQueries>(provider => provider.GetRequiredService<EventTagRepository>());
+        
         services.AddScoped<AttendanceRepository>();
         services.AddScoped<IAttendanceRepository>(provider => provider.GetRequiredService<AttendanceRepository>());
         services.AddScoped<IAttendanceQueries>(provider => provider.GetRequiredService<AttendanceRepository>());
