@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241023191014_Initial")]
-    partial class Initial
+    [Migration("20241025130746_ProfileUpdated")]
+    partial class ProfileUpdated
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -202,14 +202,13 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("address");
 
-                    b.Property<DateTime>("BirthDate")
+                    b.Property<DateTime?>("BirthDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("birth_date")
                         .HasDefaultValueSql("timezone('utc', now())");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("full_name");
 

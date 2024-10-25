@@ -12,7 +12,7 @@ public class ProfileConfigurator : IEntityTypeConfiguration<Profile>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, x => new ProfileId(x));
         
-        builder.Property(x => x.FullName).IsRequired().HasColumnType("varchar(100)");
+        builder.Property(x => x.FullName).HasColumnType("varchar(100)");
         
         builder.Property(x => x.BirthDate)
             .HasConversion(new DateTimeUtcConverter())
