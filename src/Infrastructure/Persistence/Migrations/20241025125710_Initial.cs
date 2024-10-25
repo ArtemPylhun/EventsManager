@@ -46,7 +46,7 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     full_name = table.Column<string>(type: "varchar(100)", nullable: false),
-                    birth_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "timezone('utc', now())"),
+                    birth_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "timezone('utc', now())"),
                     phone_number = table.Column<string>(type: "varchar(100)", nullable: true),
                     address = table.Column<string>(type: "varchar(100)", nullable: true)
                 },
