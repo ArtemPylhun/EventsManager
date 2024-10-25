@@ -20,11 +20,11 @@ public class Profile
     public static Profile New(ProfileId id, string? fullName, DateTime? birthDate, string? phoneNumber, string? address)
         => new(id, fullName, birthDate, phoneNumber, address);
 
-    public void UpdateDetails(string fullName, DateTime birthDate, string? phoneNumber, string? address)
+    public void UpdateDetails(string? fullName, DateTime? birthDate, string? phoneNumber, string? address)
     {
-        FullName = fullName;
-        BirthDate = birthDate;
-        PhoneNumber = phoneNumber;
-        Address = address;
+        FullName = fullName ?? FullName;
+        BirthDate = birthDate ?? BirthDate;
+        PhoneNumber = phoneNumber ?? PhoneNumber;
+        Address = address ?? Address;
     }
 }

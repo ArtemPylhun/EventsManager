@@ -17,20 +17,30 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
     public async Task<Option<User>> GetById(UserId id, CancellationToken cancellationToken)
     {
         var entity = await context.Users
-            .AsNoTracking()
+            .AsNoTracking().Include(x => x.Profile)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         
         return entity == null ? Option.None<User>() : Option.Some(entity);
     }
 
-    public async Task<Option<User>> SearchByEmailAndUsername(string email, string username, CancellationToken cancellationToken)
+    public async Task<Option<User>> SearchByEmail(string email, CancellationToken cancellationToken)
     {
         var entity = await context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Email == email && x.UserName == username , cancellationToken);
+            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
         
         return entity == null ? Option.None<User>() : Option.Some(entity);
     }
+    
+    public async Task<Option<User>> SearchByUserName(string userName, CancellationToken cancellationToken)
+    {
+        var entity = await context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.UserName == userName , cancellationToken);
+        
+        return entity == null ? Option.None<User>() : Option.Some(entity);
+    }
+
 
     public async Task<User> Add(User user, CancellationToken cancellationToken)
     {

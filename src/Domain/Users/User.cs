@@ -32,10 +32,10 @@ public class User
     public static User New(UserId userId, string userName, string email, string passwordHash, DateTime registeredOn, RoleId roleId, ProfileId profileId)
         => new(userId, userName, email, passwordHash, registeredOn, roleId, profileId);
 
-    public void UpdateDetails(string userName, string email, string passwordHash)
+    public void UpdateDetails(string? userName, string? email, string? passwordHash)
     {
-        UserName = userName;
-        Email = email;
-        PasswordHash = passwordHash;
+        UserName =  userName ?? UserName;
+        Email = email ?? Email;
+        PasswordHash = passwordHash ?? PasswordHash;
     }
 }
