@@ -5,15 +5,15 @@ namespace Domain.EventsTags;
 
 public class EventTag
 {
-    public EventTagId EventTagId { get; }
+    public EventTagId Id { get; }
     public EventId EventId { get; }
     public Event? Event { get; }
     public TagId TagId { get;}
     public Tag? Tag { get; }
 
-    private EventTag(EventTagId eventTagId, EventId eventId, TagId tagId)
+    private EventTag(EventTagId id, EventId eventId, TagId tagId)
     {
-        EventTagId = eventTagId;
+        Id = id;
         EventId = eventId;
         TagId = tagId;
     }
