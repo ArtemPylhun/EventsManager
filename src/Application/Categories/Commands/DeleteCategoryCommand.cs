@@ -14,7 +14,8 @@ public record DeleteCategoryCommand : IRequest<Result<Category, CategoryExceptio
 
 public class DeleteCategoryCommandHandler(
     ICategoryRepository categoryRepository,
-    ICategoryQueries categoryQueries) : IRequestHandler<DeleteCategoryCommand, Result<Category, CategoryException>>
+    ICategoryQueries categoryQueries,
+    IEventQueries eventQueries) : IRequestHandler<DeleteCategoryCommand, Result<Category, CategoryException>>
 {
     public async Task<Result<Category, CategoryException>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {
@@ -22,11 +23,19 @@ public class DeleteCategoryCommandHandler(
         var category = await categoryQueries.GetById(categoryId, cancellationToken);
 
         return await category.Match(
-            async c => await DeleteEntity(c, cancellationToken),
+            async c =>
+            {
+                var categoryEvents = await eventQueries.GetByCategory(categoryId, cancellationToken);
+                if (categoryEvents.Any())
+                {
+                    return new CategoryHasEventsException(categoryId);
+                }
+                return await DeleteEntity(c, cancellationToken);
+            },
             () => Task.FromResult<Result<Category, CategoryException>>(new CategoryNotFoundException(categoryId)));
     }
 
-    public async Task<Result<Category, CategoryException>> DeleteEntity(Category category,
+    private async Task<Result<Category, CategoryException>> DeleteEntity(Category category,
         CancellationToken cancellationToken)
     {
         try

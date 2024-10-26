@@ -1,6 +1,8 @@
 ﻿using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
+using Domain.Categories;
 using Domain.Events;
+using Domain.Locations;
 using Domain.Tags;
 using Microsoft.EntityFrameworkCore;
 using Optional;
@@ -27,7 +29,23 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository, I
 
         return eventTags;
     }
-    
+
+    public async Task<IReadOnlyList<Event>> GetByCategory(CategoryId categoryId, CancellationToken cancellationToken)
+    {
+        return await context.Events
+            .AsNoTracking()
+            .Where(x => x.CategoryId == categoryId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Event>> GetByLocation(LocationId locationId, CancellationToken cancellationToken)
+    {
+        return await context.Events
+            .AsNoTracking()
+            .Where(x => x.LocationId == locationId)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Option<Event>> GetById(EventId id, CancellationToken cancellationToken)
     {
         var entity = await context.Events
