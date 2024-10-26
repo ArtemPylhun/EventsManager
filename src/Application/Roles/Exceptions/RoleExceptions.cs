@@ -12,7 +12,7 @@ public class RoleNotFoundException(RoleId id) : RoleException(id, $"Role under i
 
 public class RoleAlreadyExistsException(RoleId id) : RoleException(id, $"Role already exists: {id}!");
 
-public class RoleHaveUsersException(RoleId id) : RoleException(id, $"Role under id: {id} has users!");
+public class RoleHaveUsersException(RoleId id) : RoleException(id, $"Role under id: {id} has users!"); //TODO: Implement in role deletion
 
 public class RoleUnknownException(RoleId id, Exception innerException)
     : RoleException(id, $"Unknown exception for the Role under id: {id}!", innerException);

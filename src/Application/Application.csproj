@@ -17,9 +17,4 @@
       <PackageReference Include="Optional" Version="4.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Roles\Commands\" />
-      <Folder Include="Tags\Commands\" />
-    </ItemGroup>
-
 </Project>
