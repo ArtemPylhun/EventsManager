@@ -65,7 +65,7 @@ public class CreateUserCommandHandler(
     {
         try
         {
-            var usersProfile = Profile.New(ProfileId.New, null, DateTime.UtcNow, string.Empty, String.Empty);
+            var usersProfile = Profile.New(ProfileId.New(), null, DateTime.UtcNow, string.Empty, String.Empty);
             await profileRepository.Add(usersProfile, cancellationToken);
             var passwordHash = password; //TODO: Password hashing 
             var entity = User.New(UserId.New(), userName, email, passwordHash, DateTime.UtcNow, new RoleId(roleId),
