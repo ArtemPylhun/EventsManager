@@ -34,7 +34,15 @@ public class EventTagRepository(ApplicationDbContext context) : IEventTagReposit
         
         return entity == null ? Option.None<EventTag>() : Option.Some(entity);
     }
-    
+
+    public async Task<IReadOnlyList<EventTag>> GetByEvent(EventId eventId, CancellationToken cancellationToken)
+    {
+        return await context.EventsTags
+            .AsNoTracking()
+            .Where(x => x.EventId == eventId)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<EventTag> Add(EventTag eventTag, CancellationToken cancellationToken)
     {
         await context.EventsTags.AddAsync(eventTag, cancellationToken);
