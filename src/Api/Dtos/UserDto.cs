@@ -18,7 +18,7 @@ public record UserCreateDto(
 }
 
 public record UserDto(
-    Guid UserId,
+    Guid? Id,
     string? Email,
     string? UserName,
     string? Password,
@@ -27,7 +27,7 @@ public record UserDto(
 {
     public static UserDto FromDomainModel(User user)
         => new(
-            UserId: user.Id.Value,
+            Id: user.Id.Value,
             Email: user.Email,
             UserName: user.UserName,
             Password: user.PasswordHash,

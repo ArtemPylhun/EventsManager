@@ -32,7 +32,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
     }
 
     [HttpPost]
-    public async Task<ActionResult<UserCreateDto>> Create([FromBody] UserCreateDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto request, CancellationToken cancellationToken)
     {
         var input = new CreateUserCommand
         {
@@ -44,8 +44,8 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
 
         var result = await sender.Send(input, cancellationToken);
 
-        return result.Match<ActionResult<UserCreateDto>>(
-            u => UserCreateDto.FromUserCreateDomainModel(u),
+        return result.Match<ActionResult<UserDto>>(
+            u => UserDto.FromDomainModel(u),
             e => e.ToObjectResult());
     }
 
