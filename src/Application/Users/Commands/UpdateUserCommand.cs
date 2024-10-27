@@ -15,7 +15,6 @@ public record UpdateUserCommand : IRequest<Result<User, UserException>>
     public string? Password { get; init; }
 
     public string? FullName { get; init; }
-
     public string? PhoneNumber { get; init; }
     public string? Address { get; init; }
     public DateTime? BirthDate { get; init; }
@@ -24,7 +23,7 @@ public record UpdateUserCommand : IRequest<Result<User, UserException>>
 public class UpdateUserCommandHandler(
     IUserRepository userRepository,
     IUserQueries userQueries,
-    IProfileQueries profileQueries) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
+    IProfileRepository profileRepository) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
 {
     public async Task<Result<User, UserException>> Handle(UpdateUserCommand request,
         CancellationToken cancellationToken)
@@ -52,7 +51,7 @@ public class UpdateUserCommandHandler(
         {
             entity.Profile!.UpdateDetails(fullName, birthDate, phoneNumber, address);
             entity.UpdateDetails(entity.Email, userName, password);
-
+            await profileRepository.Update(entity.Profile, cancellationToken);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)
