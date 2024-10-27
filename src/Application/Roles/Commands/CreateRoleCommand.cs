@@ -21,6 +21,7 @@ public class CreateRoleCommandHandler(
     {
         var existingRole = await roleQueries.SearchByTitle(request.Title, cancellationToken);
 
+
         return await existingRole.Match(
             r => Task.FromResult<Result<Role, RoleException>>(new RoleAlreadyExistsException(r.Id)),
             async () => await CreateEntity(request.Title, cancellationToken));
