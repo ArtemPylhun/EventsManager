@@ -16,7 +16,7 @@ namespace Application.Events.Commands;
 public record UpdateEventCommand : IRequest<Result<Event, EventException>>
 {
     public required Guid EventId { get; init; }
-    public required string Name { get; init; }
+    public required string Title { get; init; }
     public required string Description { get; init; }
     public required DateTime StartDate { get; init; }
     public required DateTime EndDate { get; init; }
@@ -56,7 +56,7 @@ public class UpdateEventCommandHandler(
                             async ec =>
                             {
                                 var entity = Event.New(EventId.New(), 
-                                    request.Name,
+                                    request.Title,
                                     request.Description,
                                     request.StartDate,
                                     request.EndDate,
