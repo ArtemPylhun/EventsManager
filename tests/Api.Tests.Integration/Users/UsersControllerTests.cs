@@ -13,6 +13,7 @@ using Tests.Common;
 using Tests.Data;
 
 namespace Api.Tests.Integration.Users;
+//TODO: add duplication check in update commands
 
 public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 {

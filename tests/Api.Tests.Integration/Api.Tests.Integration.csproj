@@ -28,11 +28,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Roles\" />
-      <Folder Include="Tags\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\src\Api\Api.csproj" />
       <ProjectReference Include="..\..\src\Domain\Domain.csproj" />
       <ProjectReference Include="..\Tests.Common\Tests.Common.csproj" />

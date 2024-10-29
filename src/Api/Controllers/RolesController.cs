@@ -64,12 +64,12 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
             e => e.ToObjectResult());
     }
     
-    [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<RoleDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    [HttpDelete("{roleId:guid}")]
+    public async Task<ActionResult<RoleDto>> Delete([FromRoute] Guid roleId, CancellationToken cancellationToken)
     {
         var input = new DeleteRoleCommand
         {
-            RoleId = id
+            RoleId = roleId
         };
 
         var result = await sender.Send(input, cancellationToken);

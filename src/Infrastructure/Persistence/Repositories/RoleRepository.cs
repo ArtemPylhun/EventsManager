@@ -6,13 +6,20 @@ using Optional;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class RoleRepository(ApplicationDbContext context): IRoleRepository, IRoleQueries
+public class RoleRepository(ApplicationDbContext context) : IRoleRepository, IRoleQueries
 {
     public async Task<IReadOnlyList<Role>> GetAll(CancellationToken cancellationToken)
     {
         return await context.Roles
             .AsNoTracking()
             .ToListAsync(cancellationToken);
+    }
+    
+    public async Task<int> GetRoleUsersCount(RoleId roleId, CancellationToken cancellationToken)
+    {
+        return await context.Users
+            .AsNoTracking()
+            .CountAsync(u => u.RoleId == roleId, cancellationToken);
     }
 
     public async Task<Option<Role>> SearchByTitle(string title, CancellationToken cancellationToken)
@@ -50,7 +57,7 @@ public class RoleRepository(ApplicationDbContext context): IRoleRepository, IRol
 
         return role;
     }
-    
+
     public async Task<Role> Delete(Role role, CancellationToken cancellationToken)
     {
         context.Roles.Remove(role);
