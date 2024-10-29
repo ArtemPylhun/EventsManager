@@ -34,51 +34,63 @@ public class UpdateEventCommandHandler(
     ICategoryQueries categoryQueries,
     IEventTagRepository eventTagRepository,
     IEventTagQueries eventTagQueries,
-    ITagQueries tagQueries) : IRequestHandler<CreateEventCommand, Result<Event, EventException>>
+    ITagQueries tagQueries) : IRequestHandler<UpdateEventCommand, Result<Event, EventException>>
 {
     public async Task<Result<Event, EventException>> Handle(
-        CreateEventCommand request,
+        UpdateEventCommand request,
         CancellationToken cancellationToken)
     {
-        var existingOrganizer = await userQueries.GetById(new UserId(request.OrganizerId), cancellationToken);
+        var existingEvent = await eventQueries.GetById(new EventId(request.EventId), cancellationToken);
 
-        return await existingOrganizer.Match(
-            async eu =>
+        return await existingEvent.Match(
+            async e =>
             {
-                var existingLocation = await locationQueries.GetById(new LocationId(request.LocationId), cancellationToken);
-                
-                return await existingLocation.Match(
-                    async el =>
+                var existingOrganizer = await userQueries.GetById(new UserId(request.OrganizerId), cancellationToken);
+
+                return await existingOrganizer.Match(
+                    async eu =>
                     {
-                        var existingCategory = await categoryQueries.GetById(new CategoryId(request.CategoryId), cancellationToken);
+                        var existingLocation =
+                            await locationQueries.GetById(new LocationId(request.LocationId), cancellationToken);
 
-                        return await existingCategory.Match(
-                            async ec =>
+                        return await existingLocation.Match(
+                            async el =>
                             {
-                                var entity = Event.New(EventId.New(), 
-                                    request.Title,
-                                    request.Description,
-                                    request.StartDate,
-                                    request.EndDate,
-                                    new UserId(request.OrganizerId),
-                                    new LocationId(request.LocationId),
-                                    new CategoryId(request.CategoryId));
+                                var existingCategory = await categoryQueries.GetById(new CategoryId(request.CategoryId),
+                                    cancellationToken);
 
-                                var existingEvent = await CheckDuplicates(entity, cancellationToken);
-                                
-                                return await existingEvent.Match(
-                                    e => Task.FromResult<Result<Event, EventException>>
-                                        (new EventAlreadyExistsException(e.Id)),
-                                    async () => await UpdateEntity(entity, request.TagsIds.Select(ti => new TagId(ti)), cancellationToken));
+                                return await existingCategory.Match(
+                                    async ec =>
+                                    {
+                                        var entity = Event.New(
+                                            new EventId(request.EventId),
+                                            request.Title,
+                                            request.Description,
+                                            request.StartDate,
+                                            request.EndDate,
+                                            new UserId(request.OrganizerId),
+                                            new LocationId(request.LocationId),
+                                            new CategoryId(request.CategoryId));
+
+                                        var duplicatedEvent = await CheckDuplicates(entity, cancellationToken);
+
+                                        return await duplicatedEvent.Match(
+                                            e => Task.FromResult<Result<Event, EventException>>
+                                                (new EventAlreadyExistsException(e.Id)),
+                                            async () => await UpdateEntity(entity,
+                                                request.TagsIds.Select(ti => new TagId(ti)), cancellationToken));
+                                    },
+                                    () => Task.FromResult<Result<Event, EventException>>(
+                                        new EventCategoryNotFoundException(EventId.Empty())));
                             },
-                            () => Task.FromResult<Result<Event, EventException>>(
-                                new EventCategoryNotFoundException(EventId.Empty())));
+                            () => Task.FromResult<Result<Event, EventException>>
+                                (new EventLocationNotFoundException(EventId.Empty())));
                     },
                     () => Task.FromResult<Result<Event, EventException>>
-                        (new EventLocationNotFoundException(EventId.Empty())));
+                        (new EventOrganizerNotFoundException(EventId.Empty())));
             },
-            () => Task.FromResult<Result<Event, EventException>>
-                (new EventOrganizerNotFoundException(EventId.Empty())));
+            () => Task.FromResult<Result<Event, EventException>>(
+                new EventNotFoundException(new EventId(request.EventId))));
     }
 
     private async Task<Result<Event, EventException>> UpdateEntity(
@@ -89,7 +101,7 @@ public class UpdateEventCommandHandler(
         try
         {
             var oldTags = await tagQueries.GetByEvent(entity.Id, cancellationToken);
-
+            
             var tagsToRemove = new List<TagId>();
             var tagsToAdd = new List<TagId>();
 

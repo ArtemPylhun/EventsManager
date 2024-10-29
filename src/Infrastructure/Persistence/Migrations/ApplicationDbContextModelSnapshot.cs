@@ -357,16 +357,16 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasOne("Domain.Events.Event", "Event")
                         .WithMany("EventsTags")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_events_tags_events_id");
+                        .HasConstraintName("fk_events_tags_events_event_id");
 
                     b.HasOne("Domain.Tags.Tag", "Tag")
                         .WithMany("EventsTags")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_events_tags_tags_id");
+                        .HasConstraintName("fk_events_tags_tags_tag_id");
 
                     b.Navigation("Event");
 
