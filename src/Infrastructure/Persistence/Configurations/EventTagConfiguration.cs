@@ -14,13 +14,11 @@ public class EventTagConfiguration : IEntityTypeConfiguration<EventTag>
         builder.HasOne(x => x.Event)
             .WithMany(x => x.EventsTags)
             .HasForeignKey(x => x.EventId)
-            .HasConstraintName("fk_events_tags_events_id")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.HasOne(x => x.Tag)
             .WithMany(x => x.EventsTags)
             .HasForeignKey(x => x.TagId)
-            .HasConstraintName("fk_events_tags_tags_id")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
