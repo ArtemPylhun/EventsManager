@@ -15,7 +15,8 @@ public record UpdateRoleCommand : IRequest<Result<Role, RoleException>>
 }
 
 public class UpdateRoleCommandHandler(
-    IRoleRepository roleRepository, IRoleQueries roleQueries) : IRequestHandler<UpdateRoleCommand, Result<Role, RoleException>>
+    IRoleRepository roleRepository,
+    IRoleQueries roleQueries) : IRequestHandler<UpdateRoleCommand, Result<Role, RoleException>>
 {
     public async Task<Result<Role, RoleException>> Handle(
         UpdateRoleCommand request,
@@ -27,7 +28,7 @@ public class UpdateRoleCommandHandler(
         return await role.Match(
             async r =>
             {
-                var existingRole = await CheckDuplicated(roleId, request.Title, cancellationToken);
+                var existingRole = await roleQueries.SearchByTitle(request.Title, cancellationToken);
 
                 return await existingRole.Match(
                     er => Task.FromResult<Result<Role, RoleException>>(new RoleAlreadyExistsException(er.Id)),
@@ -51,17 +52,5 @@ public class UpdateRoleCommandHandler(
         {
             return new RoleUnknownException(role.Id, exception);
         }
-    }
-
-    private async Task<Option<Role>> CheckDuplicated(
-        RoleId roleId,
-        string name,
-        CancellationToken cancellationToken)
-    {
-        var role = await roleQueries.SearchByTitle(name, cancellationToken);
-
-        return role.Match(
-            f => f.Id == roleId ? Option.None<Role>() : Option.Some(f),
-            Option.None<Role>);
     }
 }

@@ -7,8 +7,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Tests.Common;
 using Tests.Data;
-//TODO: add duplication check in update commands
-
 namespace Api.Tests.Integration.Tags;
 
 public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
@@ -111,6 +109,20 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbTag.Title.Should().Be(tagName);
     }
 
+    [Fact]
+    public async Task ShouldNotUpdateTagBecauseDuplicated()
+    {
+        // Arrange
+        var tagName = _mainTag.Title;
+        var request = new TagDto(_mainTag.Id.Value, tagName);
+
+        // Act
+        var response = await Client.PutAsJsonAsync("tags", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
     [Fact]
     public async Task ShouldNotUpdateTagBecauseNotFound()
     {

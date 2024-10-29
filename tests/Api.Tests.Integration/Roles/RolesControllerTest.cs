@@ -8,7 +8,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Tests.Common;
 using Tests.Data;
-//TODO: add duplication check in update commands
 namespace Api.Tests.Integration.Roles;
 
 public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
@@ -144,6 +143,20 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task ShouldNotUpdateRoleBecauseDuplicated()
+    {
+        // Arrange
+        var roleName = _mainRole.Title;
+        var request = new RoleDto(_mainRole.Id.Value, roleName);
+
+        // Act
+        var response = await Client.PutAsJsonAsync("roles", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
     public async Task InitializeAsync()
     {
         await Context.Roles.AddAsync(_mainRole);

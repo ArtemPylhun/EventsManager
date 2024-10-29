@@ -21,7 +21,6 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
     private readonly Profile _mainProfile = ProfilesData.MainProfile;
     private readonly User _mainUser;
     private readonly User _newUser;
-
     public UsersControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
         _mainUser = UsersData.MainUser(_mainRole.Id, _mainProfile.Id);
@@ -185,6 +184,29 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+    
+    [Fact]
+    public async Task ShouldNotUpdateUserBecauseUserNameDuplicated()
+    {
+        // Arrange
+        var userName = "User Name";
+        var password = "password";
+        var request = new UserUpdateDto(
+            Id: _mainUser.Id.Value,
+            UserName: userName, 
+            Password: password, 
+            FullName: "Full Name",
+            PhoneNumber: "123456789",
+            BirthDate: DateTime.UtcNow.AddYears(-19),
+            Address: "city Rivne");
+     
+        // Act
+        var response = await Client.PutAsJsonAsync("users", request);
+     
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     [Fact]
