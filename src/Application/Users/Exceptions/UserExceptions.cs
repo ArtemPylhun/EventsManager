@@ -1,4 +1,5 @@
-﻿using Domain.Roles;
+﻿using Domain.Profiles;
+using Domain.Roles;
 using Domain.Users;
 
 namespace Application.Users.Exceptions;
@@ -16,6 +17,8 @@ public class UserWithNameAlreadyExistsException(UserId id) :UserException(id, $"
 public class UserWithEmailAlreadyExistsException(UserId id) : UserException(id, $"User under such email already exists!");
 
 public class UserRoleNotFoundException(UserId id, RoleId roleId) : UserException(id, $"User's role under id: {roleId} not found!");
+public class UserProfileNotFoundException(UserId id, ProfileId profileId): UserException(id, $"User's profile under id: {profileId} not found!");
+
 
 public class UserUnknownException(UserId id, Exception innerException)
     : UserException(id, $"Unknown exception for the User under id: {id}!", innerException);

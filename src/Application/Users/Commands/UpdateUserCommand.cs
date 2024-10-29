@@ -23,7 +23,8 @@ public record UpdateUserCommand : IRequest<Result<User, UserException>>
 public class UpdateUserCommandHandler(
     IUserRepository userRepository,
     IUserQueries userQueries,
-    IProfileRepository profileRepository) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
+    IProfileRepository profileRepository,
+    IProfileQueries profileQueries) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
 {
     public async Task<Result<User, UserException>> Handle(UpdateUserCommand request,
         CancellationToken cancellationToken)
@@ -32,8 +33,19 @@ public class UpdateUserCommandHandler(
         var existingUser = await userQueries.GetById(userId, cancellationToken);
 
         return await existingUser.Match(
-            async u => await UpdateEntity(u, request.UserName, request.Password, request.FullName,
-                request.PhoneNumber, request.Address, request.BirthDate, cancellationToken),
+            async u =>
+            {
+                var existingProfile = await profileQueries.GetById(u.ProfileId, cancellationToken);
+                return await existingProfile.Match(
+                    async p =>
+                    {
+                        return await UpdateEntity(u, request.UserName, request.Password, request.FullName,
+                            request.PhoneNumber, request.Address, request.BirthDate, p, cancellationToken);
+                    },
+                    () => Task.FromResult<Result<User, UserException>>(new UserProfileNotFoundException(userId, u.ProfileId)));
+
+
+            },
             () => Task.FromResult<Result<User, UserException>>(new UserNotFoundException(userId)));
     }
 
@@ -45,13 +57,14 @@ public class UpdateUserCommandHandler(
         string? phoneNumber,
         string? address,
         DateTime? birthDate,
+        Profile profile,
         CancellationToken cancellationToken)
     {
         try
         {
-            entity.Profile!.UpdateDetails(fullName, birthDate, phoneNumber, address);
-            entity.UpdateDetails(entity.Email, userName, password);
-            await profileRepository.Update(entity.Profile, cancellationToken);
+            //var profile = Profile.New(entity.ProfileId, fullName,birthDate ,phoneNumber, address);
+            profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
+            entity.UpdateDetails(userName,entity.Email, password);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)
