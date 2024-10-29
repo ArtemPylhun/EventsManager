@@ -50,7 +50,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
     }
 
     [HttpPut]
-    public async Task<ActionResult<UserUpdateDto>> Update([FromBody] UserUpdateDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> Update([FromBody] UserUpdateDto request, CancellationToken cancellationToken)
     {
         var input = new UpdateUserCommand
         {
@@ -65,8 +65,8 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
 
         var result = await sender.Send(input, cancellationToken);
 
-        return result.Match<ActionResult<UserUpdateDto>>(
-            user => UserUpdateDto.FromUserUpdateDomainModel(user),
+        return result.Match<ActionResult<UserDto>>(
+            user => UserDto.FromDomainModel(user),
             e => e.ToObjectResult());
     }
 
