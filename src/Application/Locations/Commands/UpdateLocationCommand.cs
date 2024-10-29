@@ -37,18 +37,29 @@ public class UpdateLocationCommandHandler(
 
                 return await duplicatedLocation.Match(
                     el => Task.FromResult<Result<Location, LocationException>>(new LocationAlreadyExistsException(el.Id)),
-                    async () => await UpdateEntity(l, cancellationToken));
+                    async () => await UpdateEntity(l,
+                        location.Name,
+                        location.Address,
+                        location.City,
+                        location.Country,
+                        location.Capacity,
+                        cancellationToken));
             },
             () => Task.FromResult<Result<Location, LocationException>>(new LocationNotFoundException(locationId)));
     }
 
     private async Task<Result<Location, LocationException>> UpdateEntity(
         Location location,
+        string name,
+        string address,
+        string city,
+        string country,
+        int capacity,
         CancellationToken cancellationToken)
     {
         try
         {
-            location.UpdateDetails(location.Name, location.Address, location.City, location.Country, location.Capacity);
+            location.UpdateDetails(name, address, city, country, capacity);
 
             return await locationRepository.Update(location, cancellationToken);
         }

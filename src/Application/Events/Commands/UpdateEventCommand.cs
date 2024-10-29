@@ -127,9 +127,7 @@ public class UpdateEventCommandHandler(
                 await eventTagRepository.Add(EventTag.New(EventTagId.New(), entity.Id, tagId), cancellationToken);
             }
             
-            await eventRepository.Update(entity, cancellationToken);
-            
-            return entity;
+            return await eventRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)
         {

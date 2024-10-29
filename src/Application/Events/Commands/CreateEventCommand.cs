@@ -85,14 +85,14 @@ public class CreateEventCommandHandler(
     {
         try
         {
-            await eventRepository.Add(entity, cancellationToken);
+            var result = await eventRepository.Add(entity, cancellationToken);
             
             foreach (var tag in tags)
             {
                 await eventTagRepository.Add(EventTag.New(EventTagId.New(), entity.Id, new TagId(tag)), cancellationToken);
             }
 
-            return entity;
+            return result;
         }
         catch (Exception exception)
         {

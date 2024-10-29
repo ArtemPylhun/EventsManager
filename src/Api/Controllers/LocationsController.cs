@@ -54,7 +54,7 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
     {
         var input = new UpdateLocationCommand
         {
-            LocationId = request.LocationId!.Value,
+            LocationId = request.Id!.Value,
             Name = request.Name,
             Address = request.Address,
             City = request.City,
