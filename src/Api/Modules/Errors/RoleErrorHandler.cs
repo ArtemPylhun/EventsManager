@@ -12,7 +12,7 @@ public static class RoleErrorHandler
             StatusCode = exception switch
             {
                 RoleNotFoundException => StatusCodes.Status404NotFound,
-                RoleAlreadyExistsException => StatusCodes.Status409Conflict,
+                RoleAlreadyExistsException or RoleHaveUsersException => StatusCodes.Status409Conflict,
                 RoleUnknownException => StatusCodes.Status500InternalServerError,
                 _ => throw new NotImplementedException("Faculty error handler does not implemented")
             }

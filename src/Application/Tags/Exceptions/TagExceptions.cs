@@ -12,7 +12,5 @@ public class TagNotFoundException(TagId id) : TagException(id, $"Tag under id: {
 
 public class TagAlreadyExistsException(TagId id) : TagException(id, $"Tag already exists: {id}!");
 
-public class TagHaveEventsException(TagId id) : TagException(id, $"Tag under id: {id} has events!"); // TODO: implement
-
 public class TagUnknownException(TagId id, Exception innerException)
     : TagException(id, $"Unknown exception for the Tag under id: {id}!", innerException);

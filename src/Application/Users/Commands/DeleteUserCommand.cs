@@ -15,6 +15,7 @@ public record DeleteUserCommand : IRequest<Result<User, UserException>>
 public class DeleteUserCommandHandler(IUserRepository userRepository, IUserQueries userQueries)
     : IRequestHandler<DeleteUserCommand, Result<User, UserException>>
 {
+
     public async Task<Result<User, UserException>> Handle(
         DeleteUserCommand request,
         CancellationToken cancellationToken)

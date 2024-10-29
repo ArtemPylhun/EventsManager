@@ -21,12 +21,20 @@ public class DeleteRoleCommandHandler(
     {
         var roleId = new RoleId(request.RoleId);
         var existingRole = await roleQueries.GetById(roleId, cancellationToken);
-        
+
         return await existingRole.Match(
-            async role => await DeleteEntity(role, cancellationToken),
+            async role =>
+            {
+                var usersCount = await roleQueries.GetRoleUsersCount(roleId, cancellationToken);
+                if (usersCount > 0)
+                {
+                    return new RoleHaveUsersException(roleId);
+                }
+                return await DeleteEntity(role, cancellationToken);
+            },
             () => Task.FromResult<Result<Role, RoleException>>(new RoleNotFoundException(roleId)));
     }
-    
+
     private async Task<Result<Role, RoleException>> DeleteEntity(Role role, CancellationToken cancellationToken)
     {
         try
