@@ -3,7 +3,7 @@
 namespace Api.Dtos;
 
 public record LocationDto(
-    Guid? LocationId,
+    Guid? Id,
     string Name,
     string Address,
     string City,

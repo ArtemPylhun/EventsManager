@@ -40,9 +40,7 @@ public class DeleteCategoryCommandHandler(
     {
         try
         {
-            await categoryRepository.Delete(category, cancellationToken);
-
-            return category;
+            return await categoryRepository.Delete(category, cancellationToken);
         }
         catch (Exception exception)
         {

@@ -40,9 +40,7 @@ public class DeleteLocationCommandHandler(
     {
         try
         {
-            await locationRepository.Delete(location, cancellationToken);
-
-            return location;
+            return await locationRepository.Delete(location, cancellationToken);
         }
         catch (Exception exception)
         {
