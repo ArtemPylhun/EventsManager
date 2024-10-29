@@ -36,13 +36,6 @@ public class DeleteEventCommandHandler(
     {
         try
         {
-            var eventTags = await eventTagQueries.GetByEvent(entity.Id, cancellationToken);
-
-            foreach (var tag in eventTags)
-            {
-                await eventTagRepository.Delete(tag, cancellationToken);
-            }
-            
             return await eventRepository.Delete(entity, cancellationToken);
         }
         catch (Exception exception)

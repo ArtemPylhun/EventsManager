@@ -18,12 +18,14 @@ public class TagRepository(ApplicationDbContext context) : ITagRepository, ITagQ
 
     public async Task<IReadOnlyList<Tag>> GetByEvent(EventId eventId, CancellationToken cancellationToken)
     {
-        var eventTags = context.EventsTags
+        var eventTags = await context.EventsTags
             .AsNoTracking()
-            .Where(et => et.EventId == eventId);
+            .Where(et => et.EventId == eventId)
+            .Select(et => et.TagId)
+            .ToListAsync(cancellationToken);
         
         return await context.Tags.AsNoTracking()
-            .Where(t => eventTags.Any(et => et.TagId == t.Id))
+            .Where(t => eventTags.Contains(t.Id))
             .ToListAsync(cancellationToken);
     }
 
