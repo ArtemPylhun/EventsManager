@@ -64,8 +64,7 @@ public class UpdateUserCommandHandler(
         {
             //var profile = Profile.New(entity.ProfileId, fullName,birthDate ,phoneNumber, address);
             profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
-            entity.UpdateDetails(entity.Email, userName, password);
-            await profileRepository.Update(profile, cancellationToken);
+            entity.UpdateDetails(userName,entity.Email, password);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)

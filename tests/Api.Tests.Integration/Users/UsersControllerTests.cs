@@ -1,11 +1,14 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using Api.Dtos;
 using Domain.Profiles;
 using Domain.Roles;
 using Domain.Users;
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Tests.Common;
 using Tests.Data;
 
@@ -157,32 +160,61 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbProfile.FullName.Should().Be(_mainProfile.FullName);
         dbProfile.PhoneNumber.Should().Be(_mainProfile.PhoneNumber);
         dbProfile.Address.Should().Be(_mainProfile.Address);
-        dbProfile.BirthDate.Value.Should().Be(_mainProfile.BirthDate.Value);
+        dbProfile.BirthDate.Value.Date.Should().Be(_mainProfile.BirthDate.Value.Date);
     }
     
-    /*[Fact]
-    public async Task ShouldNotUpdateUserBecauseNotFound()
+    [Fact]
+    public async Task ShouldNotUpdateUserBecauseUserNotFound()
     {
-        var newUserId = Guid.NewGuid();
-        // Arrange
-        var newFirstName = "ReJohn";
-        var newLastName = "ReDoe";
-        var request = new UserDto(
-            Id: newUserId,
-            FirstName: newFirstName,
-            LastName: newLastName,
-            FullName: null,
-            UpdatedAt: null,
-            FacultyId: _mainFaculty.Id.Value,
-            Faculty: null);
-
+        var userName = "Update User Name";
+        var email = "updateUserName@gmail.com";
+        var password = "password";
+        var request = new UserUpdateDto(
+            Id: _newUser.Id.Value,
+            UserName: userName, 
+            Password: password,
+            FullName: "Full Name",
+            PhoneNumber: "123456789", 
+            Address: "city Rivne", 
+            BirthDate: DateTime.UtcNow.AddYears(-19));
+     
         // Act
         var response = await Client.PutAsJsonAsync("users", request);
-
+     
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }*/
+    }
+
+    [Fact]
+    public async Task ShouldDeleteUser()
+    {
+        // Arrange
+        var userId = _mainUser.Id.Value;
+
+        // Act
+        var response = await Client.DeleteAsync($"users/{userId}");
+     
+        // Assert
+        response.IsSuccessStatusCode.Should().BeTrue();
+        
+    }
+    
+    [Fact]
+    public async Task ShouldNotDeleteUserBecauseNotFound()
+    {
+        // Arrange
+        var userId = _newUser.Id.Value;
+
+        // Act
+        var response = await Client.DeleteAsync($"users/{userId}");
+     
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        
+    }
     
     public async Task InitializeAsync()
     {

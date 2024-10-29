@@ -11,7 +11,7 @@ public static class UserErrorHandler
         {
             StatusCode = exception switch
             {
-                UserNotFoundException or UserRoleNotFoundException => StatusCodes.Status404NotFound,
+                UserNotFoundException or UserRoleNotFoundException or UserProfileNotFoundException => StatusCodes.Status404NotFound,
                 UserWithNameAlreadyExistsException or UserWithEmailAlreadyExistsException => StatusCodes
                     .Status409Conflict,
                 UserUnknownException => StatusCodes.Status500InternalServerError,
