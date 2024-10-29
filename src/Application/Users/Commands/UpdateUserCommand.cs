@@ -39,12 +39,16 @@ public class UpdateUserCommandHandler(
                 return await existingProfile.Match(
                     async p =>
                     {
-                        return await UpdateEntity(u, request.UserName, request.Password, request.FullName,
-                            request.PhoneNumber, request.Address, request.BirthDate, p, cancellationToken);
+                        var existingUserWithSameName =
+                            await userQueries.SearchByUserName(request.UserName, cancellationToken);
+                        return await existingUserWithSameName.Match(
+                            un => Task.FromResult<Result<User, UserException>>(
+                                new UserWithNameAlreadyExistsException(userId)),
+                            async () => await UpdateEntity(u, request.UserName, request.Password, request.FullName,
+                                request.PhoneNumber, request.Address, request.BirthDate, p, cancellationToken));
                     },
-                    () => Task.FromResult<Result<User, UserException>>(new UserProfileNotFoundException(userId, u.ProfileId)));
-
-
+                    () => Task.FromResult<Result<User, UserException>>(
+                        new UserProfileNotFoundException(userId, u.ProfileId)));
             },
             () => Task.FromResult<Result<User, UserException>>(new UserNotFoundException(userId)));
     }
@@ -62,9 +66,8 @@ public class UpdateUserCommandHandler(
     {
         try
         {
-            //var profile = Profile.New(entity.ProfileId, fullName,birthDate ,phoneNumber, address);
             profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
-            entity.UpdateDetails(userName,entity.Email, password);
+            entity.UpdateDetails(userName, entity.Email, password);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)

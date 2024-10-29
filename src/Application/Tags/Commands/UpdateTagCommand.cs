@@ -27,11 +27,11 @@ public class UpdateTagCommandHandler(
         return await tag.Match(
             async f =>
             {
-                var existingTag = await CheckDuplicated(tagId, request.Title, cancellationToken);
-
+                var existingTag = await tagQueries.SearchByTitle(request.Title, cancellationToken);
                 return await existingTag.Match(
-                    ef => Task.FromResult<Result<Tag, TagException>>(new TagAlreadyExistsException(ef.Id)),
-                    async () => await UpdateEntity(f, request.Title, cancellationToken));
+                    f => Task.FromResult<Result<Tag, TagException>>(new TagAlreadyExistsException(f.Id)),
+                    async () => await UpdateEntity(f,request.Title, cancellationToken));
+                
             },
             () => Task.FromResult<Result<Tag, TagException>>(new TagNotFoundException(tagId)));
     }
@@ -51,17 +51,5 @@ public class UpdateTagCommandHandler(
         {
             return new TagUnknownException(tag.Id, exception);
         }
-    }
-
-    private async Task<Option<Tag>> CheckDuplicated(
-        TagId tagId,
-        string name,
-        CancellationToken cancellationToken)
-    {
-        var tag = await tagQueries.SearchByTitle(name, cancellationToken);
-
-        return tag.Match(
-            f => f.Id == tagId ? Option.None<Tag>() : Option.Some(f),
-            Option.None<Tag>);
     }
 }
