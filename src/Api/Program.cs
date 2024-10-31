@@ -10,6 +10,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddCors(c =>
+{
+    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -20,7 +26,7 @@ if (app.Environment.IsDevelopment())
 
 await app.InitializeDb();
 app.MapControllers();
-
+app.UseCors("AllowOrigin");
 app.Run();
 
 public partial class Program;
