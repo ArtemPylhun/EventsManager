@@ -92,7 +92,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
     public async Task<ActionResult<UserDto>> UpdateRole([FromBody] UpdateUserRoleDto request,
         CancellationToken cancellationToken)
     {
-        var input = new ChangeUserRoleCommand
+        var input = new UpdateUserRoleCommand
         {
             UserId = request.UserId,
             RoleId = request.RoleId

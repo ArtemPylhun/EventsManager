@@ -19,6 +19,7 @@ namespace Api.Tests.Integration.Users;
 public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 {
     private readonly Role _userRole = RolesData.UserRole;
+    private readonly Role _adminRole = RolesData.AdminRole;
     private readonly Profile _mainProfile = ProfilesData.MainProfile;
     private readonly User _mainUser;
     private readonly User _newUser;
@@ -276,9 +277,60 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task ShouldChangeUserRole()
+    {
+        // Arrange
+        var existingRole = _adminRole;
+        var request = new UpdateUserRoleDto(
+            UserId: _mainUser.Id.Value,
+            RoleId: existingRole.Id.Value);
+
+        // Act
+        var response = await Client.PutAsJsonAsync("users/setRole", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeTrue();
+        var dbUser = await Context.Users.FirstAsync(x => x.Id == _mainUser.Id);
+        dbUser.RoleId.Value.Should().Be(existingRole.Id.Value);
+    }
+
+    [Fact]
+    public async Task ShouldNotChangeUserRoleBecauseUserNotFound()
+    {
+        // Arrange
+        var existingRole = _adminRole;
+        var request = new UpdateUserRoleDto(UserId: Guid.NewGuid(),
+            RoleId: existingRole.Id.Value);
+
+        // Act
+        var response = await Client.PutAsJsonAsync("users/setRole", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task ShouldNotChangeUserRoleBecauseRoleNotFound()
+    {
+        // Arrange
+        var request = new UpdateUserRoleDto(
+            UserId: _mainUser.Id.Value,
+            RoleId: Guid.NewGuid());
+
+        // Act
+        var response = await Client.PutAsJsonAsync("users/setRole", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     public async Task InitializeAsync()
     {
         await Context.Roles.AddAsync(_userRole);
+        await Context.Roles.AddAsync(_adminRole);
         await Context.Profiles.AddAsync(_mainProfile);
         await Context.Users.AddAsync(_mainUser);
 

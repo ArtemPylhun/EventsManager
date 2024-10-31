@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Application.Users.Commands;
 
-public record ChangeUserRoleCommand : IRequest<Result<User, UserException>>
+public record UpdateUserRoleCommand : IRequest<Result<User, UserException>>
 {
     public required Guid UserId { get; init; }
     public required Guid RoleId { get; init; }
@@ -19,9 +19,9 @@ public class ChangeUserRoleCommandHandler(
     IUserRepository userRepository,
     IUserQueries userQueries,
     IRoleQueries roleQueries)
-    : IRequestHandler<ChangeUserRoleCommand, Result<User, UserException>>
+    : IRequestHandler<UpdateUserRoleCommand, Result<User, UserException>>
 {
-    public async Task<Result<User, UserException>> Handle(ChangeUserRoleCommand request,
+    public async Task<Result<User, UserException>> Handle(UpdateUserRoleCommand request,
         CancellationToken cancellationToken)
     {
         var userId = new UserId(request.UserId);
