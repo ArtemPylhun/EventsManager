@@ -4,6 +4,6 @@ namespace Tests.Data;
 
 public class RolesData
 {
-    public static Role MainRole => Role.New(RoleId.New(), "Admin");
-    public static Role NoUsersRole => Role.New(RoleId.New(), "User");
+    public static Role UserRole => Role.New(RoleId.New(), "User");
+    public static Role NoUsersRole => Role.New(RoleId.New(), "No users");
 }

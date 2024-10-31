@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Users.Commands;
 using Domain.Users;
 using MediatR;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -21,6 +22,22 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
         return entities.Select(UserDto.FromDomainModel).ToList();
     }
 
+    [HttpPost("login")]
+    public async Task<ActionResult> LoginUser([FromBody] LoginRequest request, CancellationToken cancellationToken)
+    {
+        var input = new LoginUserCommand
+        {
+            Email = request.Email,
+            Password = request.Password
+        };
+
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult>(
+            u => Ok(u),
+            e => e.ToObjectResult());
+    }
+
     [HttpGet("{userId:guid}")]
     public async Task<ActionResult<UserDto>> GetById([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
@@ -32,14 +49,14 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
     }
 
     [HttpPost]
-    public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto request,
+        CancellationToken cancellationToken)
     {
         var input = new CreateUserCommand
         {
             Email = request.Email,
             UserName = request.UserName,
             Password = request.Password,
-            RoleId = request.RoleId
         };
 
         var result = await sender.Send(input, cancellationToken);
@@ -50,7 +67,8 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
     }
 
     [HttpPut]
-    public async Task<ActionResult<UserDto>> Update([FromBody] UserUpdateDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> Update([FromBody] UserUpdateDto request,
+        CancellationToken cancellationToken)
     {
         var input = new UpdateUserCommand
         {
@@ -60,7 +78,24 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             FullName = request.FullName,
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
-            BirthDate = request.BirthDate            
+            BirthDate = request.BirthDate
+        };
+
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult<UserDto>>(
+            user => UserDto.FromDomainModel(user),
+            e => e.ToObjectResult());
+    }
+
+    [HttpPut("setRole")]
+    public async Task<ActionResult<UserDto>> UpdateRole([FromBody] UpdateUserRoleDto request,
+        CancellationToken cancellationToken)
+    {
+        var input = new ChangeUserRoleCommand
+        {
+            UserId = request.UserId,
+            RoleId = request.RoleId
         };
 
         var result = await sender.Send(input, cancellationToken);

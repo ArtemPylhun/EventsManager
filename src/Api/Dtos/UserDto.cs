@@ -1,4 +1,5 @@
-﻿using Domain.Users;
+﻿using Domain.Roles;
+using Domain.Users;
 
 namespace Api.Dtos;
 
@@ -39,9 +40,7 @@ public record UserUpdateDto(
     Guid Id,
     string? UserName,
     string? Password,
-
     string? FullName,
-
     string? PhoneNumber,
     string? Address,
     DateTime? BirthDate)
@@ -55,5 +54,16 @@ public record UserUpdateDto(
             PhoneNumber: user.Profile.PhoneNumber,
             Address: user.Profile.Address,
             BirthDate: user.Profile.BirthDate
+        );
+}
+
+public record UpdateUserRoleDto(
+    Guid UserId,
+    Guid RoleId)
+{
+    public static UpdateUserRoleDto FromUserUpdateDomainModel(User user)
+        => new(
+            UserId: user.Id.Value,
+            RoleId: user.RoleId.Value
         );
 }

@@ -4,6 +4,8 @@ namespace Domain.Roles;
 
 public class Role
 {
+    public static readonly Role User = new(RoleId.New(), "User");
+    public static readonly Role Admin = new(RoleId.New(), "Admin");
     public RoleId Id { get; }
     public string Title { get; private set; }
 

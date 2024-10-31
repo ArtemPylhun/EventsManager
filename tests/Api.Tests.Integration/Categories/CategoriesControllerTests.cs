@@ -19,11 +19,11 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
     private readonly Category _mainCategory = CategoriesData.MainCategory;
     private readonly Category _secondaryCategory = CategoriesData.SecondaryCategory;
     private readonly Location _mainLocation = LocationsData.MainLocation;
-    private readonly Role _mainRole = RolesData.MainRole;
+    private readonly Role _mainRole = RolesData.UserRole;
     private readonly Profile _mainProfile = ProfilesData.MainProfile;
     private readonly User _mainUser;
     private readonly Event _mainEvent;
-    
+
     public CategoriesControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
         _mainUser = UsersData.MainUser(_mainRole.Id, _mainProfile.Id);
@@ -43,16 +43,16 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseCategory = await response.ToResponseModel<CategoryDto>();
         var categoryId = new CategoryId(responseCategory.Id!.Value);
-        
+
         var dbCategory = await Context.Categories.FirstAsync(x => x.Id == categoryId);
         dbCategory.Should().NotBeNull();
         dbCategory.Name.Should().Be(categoryName);
         dbCategory.Description.Should().Be(categoryDescription);
     }
-    
+
     [Fact]
     public async Task ShouldNotCreateCategoryBecauseNameDuplicated()
     {
@@ -82,16 +82,16 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseCategory = await response.ToResponseModel<CategoryDto>();
         var categoryId = new CategoryId(responseCategory.Id!.Value);
-        
+
         var dbCategory = await Context.Categories.FirstAsync(x => x.Id == categoryId);
         dbCategory.Should().NotBeNull();
         dbCategory.Name.Should().Be(categoryName);
         dbCategory.Description.Should().Be(categoryDescription);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateCategoryBecauseNameDuplicated()
     {
@@ -107,7 +107,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateCategoryBecauseCategoryNotFound()
     {
@@ -123,7 +123,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldDeleteCategory()
     {
@@ -135,14 +135,14 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseCategory = await response.ToResponseModel<CategoryDto>();
         responseCategory.Id.Should().Be(categoryId.Value);
-        
+
         var dbCategory = await Context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
         dbCategory.Should().BeNull();
     }
-    
+
     [Fact]
     public async Task ShouldNotDeleteCategoryBecauseCategoryNotFound()
     {
@@ -156,7 +156,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotDeleteCategoryBecauseCategoryHasEvents()
     {
@@ -179,7 +179,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         await Context.Categories.AddRangeAsync(_mainCategory, _secondaryCategory);
         await Context.Locations.AddAsync(_mainLocation);
         await Context.Events.AddAsync(_mainEvent);
-        
+
         await SaveChangesAsync();
     }
 
@@ -191,7 +191,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         Context.Users.RemoveRange(Context.Users);
         Context.Profiles.RemoveRange(Context.Profiles);
         Context.Roles.RemoveRange(Context.Roles);
-        
+
         await SaveChangesAsync();
     }
 }

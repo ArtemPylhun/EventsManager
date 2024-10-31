@@ -11,4 +11,10 @@ public static class TestsExtensions
         return JsonConvert.DeserializeObject<T>(content)
                ?? throw new ArgumentException("Response content cannot be null.");
     }
+
+    public static async Task<string> ToResponseModel(this HttpResponseMessage response)
+    {
+        return await response.Content.ReadAsStringAsync()
+               ?? throw new ArgumentException("Response content cannot be null.");
+    }
 }

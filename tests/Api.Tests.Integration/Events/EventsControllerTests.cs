@@ -20,7 +20,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
 {
     private readonly Category _mainCategory = CategoriesData.MainCategory;
     private readonly Location _mainLocation = LocationsData.MainLocation;
-    private readonly Role _mainRole = RolesData.MainRole;
+    private readonly Role _mainRole = RolesData.UserRole;
     private readonly Profile _mainProfile = ProfilesData.MainProfile;
     private readonly Tag _secondaryTag = TagsData.SecondaryTag;
     private readonly Tag _mainTag = TagsData.MainTag;
@@ -28,7 +28,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
     private readonly Event _mainEvent;
     private readonly Event _secondaryEvent;
     private readonly EventTag _mainEventTag;
-    
+
     public EventsControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
         _mainUser = UsersData.MainUser(_mainRole.Id, _mainProfile.Id);
@@ -36,7 +36,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         _secondaryEvent = EventsData.SecondaryEvent(_mainUser.Id, _mainLocation.Id, _mainCategory.Id);
         _mainEventTag = EventTagsData.New(_mainEvent.Id, _mainTag.Id);
     }
-    
+
     [Fact]
     public async Task ShouldCreateEvent()
     {
@@ -56,17 +56,17 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
-            new []{_mainTag.Id.Value});
+            new[] { _mainTag.Id.Value });
 
         // Act
         var response = await Client.PostAsJsonAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseEvent = await response.ToResponseModel<EventDto>();
         var eventId = new EventId(responseEvent.Id);
-        
+
         var dbEvent = await Context.Events.FirstAsync(x => x.Id == eventId);
         dbEvent.Should().NotBeNull();
         dbEvent.Title.Should().Be(eventTitle);
@@ -77,7 +77,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbEvent.LocationId.Should().Be(locationId);
         dbEvent.CategoryId.Should().Be(categoryId);
     }
-    
+
     [Fact]
     public async Task ShouldNotCreateEventBecauseCategoryAlreadyExists()
     {
@@ -96,7 +96,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
-            new []{_mainTag.Id.Value});
+            new[] { _mainTag.Id.Value });
 
         // Act
         var response = await Client.PostAsJsonAsync("events", request);
@@ -105,7 +105,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
-    
+
     [Fact]
     public async Task ShouldNotCreateEventBecauseOrganizerNotFound()
     {
@@ -124,7 +124,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId,
             locationId.Value,
             categoryId.Value,
-            new []{_mainTag.Id.Value});
+            new[] { _mainTag.Id.Value });
 
         // Act
         var response = await Client.PostAsJsonAsync("events", request);
@@ -133,7 +133,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotCreateEventBecauseLocationNotFound()
     {
@@ -152,7 +152,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId,
             categoryId.Value,
-            new []{_mainTag.Id.Value});
+            new[] { _mainTag.Id.Value });
 
         // Act
         var response = await Client.PostAsJsonAsync("events", request);
@@ -161,7 +161,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotCreateEventBecauseCategoryNotFound()
     {
@@ -180,7 +180,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId.Value,
             categoryId,
-            new []{_mainTag.Id.Value});
+            new[] { _mainTag.Id.Value });
 
         // Act
         var response = await Client.PostAsJsonAsync("events", request);
@@ -189,7 +189,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldUpdateEvent()
     {
@@ -210,17 +210,17 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
-            new []{_secondaryTag.Id.Value});
+            new[] { _secondaryTag.Id.Value });
 
         // Act
         var response = await Client.PutAsJsonAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseEvent = await response.ToResponseModel<EventDto>();
         var eventId = new EventId(responseEvent.Id);
-        
+
         var dbEvent = await Context.Events.FirstAsync(x => x.Id == eventId);
         dbEvent.Should().NotBeNull();
         dbEvent.Title.Should().Be(eventTitle);
@@ -231,8 +231,8 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbEvent.LocationId.Should().Be(locationId);
         dbEvent.CategoryId.Should().Be(categoryId);
     }
-    
-    
+
+
     [Fact]
     public async Task ShouldNotUpdateEventBecauseEventNotFound()
     {
@@ -253,7 +253,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
-            new []{_secondaryTag.Id.Value});
+            new[] { _secondaryTag.Id.Value });
 
         // Act
         var response = await Client.PutAsJsonAsync("events", request);
@@ -262,7 +262,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateEventBecauseOrganizerNotFound()
     {
@@ -283,7 +283,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId,
             locationId.Value,
             categoryId.Value,
-            new []{_secondaryTag.Id.Value});
+            new[] { _secondaryTag.Id.Value });
 
         // Act
         var response = await Client.PutAsJsonAsync("events", request);
@@ -292,7 +292,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateEventBecauseLocationNotFound()
     {
@@ -313,7 +313,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId,
             categoryId.Value,
-            new []{_secondaryTag.Id.Value});
+            new[] { _secondaryTag.Id.Value });
 
         // Act
         var response = await Client.PutAsJsonAsync("events", request);
@@ -322,7 +322,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateEventBecauseCategoryNotFound()
     {
@@ -343,7 +343,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             organizerId.Value,
             locationId.Value,
             categoryId,
-            new []{_secondaryTag.Id.Value});
+            new[] { _secondaryTag.Id.Value });
 
         // Act
         var response = await Client.PutAsJsonAsync("events", request);
@@ -352,7 +352,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldDeleteEvent()
     {
@@ -364,14 +364,14 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseEvent = await response.ToResponseModel<EventDto>();
         responseEvent.Id.Should().Be(eventId.Value);
-        
+
         var dbEvent = await Context.Events.FirstOrDefaultAsync(x => x.Id == eventId);
         dbEvent.Should().BeNull();
     }
-    
+
     [Fact]
     public async Task ShouldNotDeleteEventBecauseEventNotFound()
     {
@@ -397,7 +397,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         await Context.Events.AddRangeAsync(_mainEvent, _secondaryEvent);
         await Context.Tags.AddRangeAsync(_mainTag, _secondaryTag);
         await Context.EventsTags.AddAsync(_mainEventTag);
-        
+
         await SaveChangesAsync();
     }
 
@@ -411,7 +411,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         Context.Users.RemoveRange(Context.Users);
         Context.Profiles.RemoveRange(Context.Profiles);
         Context.Roles.RemoveRange(Context.Roles);
-        
+
         await SaveChangesAsync();
     }
 }

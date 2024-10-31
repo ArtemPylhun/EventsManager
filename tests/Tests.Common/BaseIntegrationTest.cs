@@ -57,7 +57,7 @@ public class TestAuthHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var claims = new[] { new Claim(ClaimTypes.Role, "admin"), new Claim("userId", "admin") };
+        var claims = new[] { new Claim(ClaimTypes.Role, "Admin"), new Claim("userId", "admin") };
         var identity = new ClaimsIdentity(claims, "Test");
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, "TestScheme");
