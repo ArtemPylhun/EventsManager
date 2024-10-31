@@ -15,15 +15,18 @@ public class LocationRepository(ApplicationDbContext context): ILocationReposito
             .ToListAsync(cancellationToken);
     }
 
-    /*public async Task<Option<Location>> SearchByName(string name, CancellationToken cancellationToken)
+    public async Task<Option<Location>> SearchDuplicate(Location location, CancellationToken cancellationToken)
     {
         var entity = await context.Locations
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
+            .FirstOrDefaultAsync(x => 
+                x.Name == location.Name &&
+                x.Country == location.Country && 
+                x.City == location.City &&
+                x.Address == location.Address, cancellationToken);
 
         return entity == null ? Option.None<Location>() : Option.Some(entity);
-    }*/
-
+    }
     public async Task<Option<Location>> GetById(LocationId id, CancellationToken cancellationToken)
     {
         var entity = await context.Locations

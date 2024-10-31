@@ -22,12 +22,12 @@ public class AttendanceConfigurator : IEntityTypeConfiguration<Attendance>
             .WithMany(u => u.Attendances)
             .HasForeignKey(a => a.UserId)
             .HasConstraintName("fk_attendances_users_id")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(ue => ue.Event)
             .WithMany(e => e.Attendances)
             .HasForeignKey(e => e.EventId)
             .HasConstraintName("fk_attendances_events_id")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

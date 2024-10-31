@@ -1,4 +1,6 @@
-﻿using Domain.Users;
+﻿using Domain.Profiles;
+using Domain.Roles;
+using Domain.Users;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -19,12 +21,14 @@ public class UserConfigurator: IEntityTypeConfiguration<User>
             .HasConversion(new DateTimeUtcConverter())
             .HasDefaultValueSql("timezone('utc', now())");
 
+        builder.Property(x => x.RoleId).HasConversion(x => x.Value, x => new RoleId(x));
         builder.HasOne(x => x.Role)
             .WithMany()
             .HasForeignKey(x => x.RoleId)
             .HasConstraintName("fk_users_roles_id")
             .OnDelete(DeleteBehavior.Restrict);
         
+        builder.Property(x => x.ProfileId).HasConversion(x => x.Value, x => new ProfileId(x));
         builder.HasOne(x => x.Profile)
             .WithOne()
             .HasForeignKey<User>(x => x.ProfileId)
