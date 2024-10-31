@@ -19,11 +19,11 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
     private readonly Location _mainLocation = LocationsData.MainLocation;
     private readonly Location _secondaryLocation = LocationsData.SecondaryLocation;
     private readonly Category _mainCategory = CategoriesData.MainCategory;
-    private readonly Role _mainRole = RolesData.MainRole;
+    private readonly Role _mainRole = RolesData.UserRole;
     private readonly Profile _mainProfile = ProfilesData.MainProfile;
     private readonly User _mainUser;
     private readonly Event _mainEvent;
-    
+
     public LocationsControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
         _mainUser = UsersData.MainUser(_mainRole.Id, _mainProfile.Id);
@@ -52,10 +52,10 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseLocation = await response.ToResponseModel<LocationDto>();
         var locationId = new LocationId(responseLocation.Id!.Value);
-        
+
         var dbLocation = await Context.Locations.FirstAsync(x => x.Id == locationId);
         dbLocation.Should().NotBeNull();
         dbLocation.Name.Should().Be(locationName);
@@ -64,7 +64,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbLocation.Country.Should().Be(locationCountry);
         dbLocation.Capacity.Should().Be(locationCapacity);
     }
-    
+
     [Fact]
     public async Task ShouldNotCreateLocationBecauseLocationExists()
     {
@@ -81,7 +81,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
             locationCity,
             locationCountry,
             locationCapacity);
-        
+
         // Act
         var response = await Client.PostAsJsonAsync("locations", request);
 
@@ -112,10 +112,10 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseLocation = await response.ToResponseModel<LocationDto>();
         var locationId = new LocationId(responseLocation.Id!.Value);
-        
+
         var dbLocation = await Context.Locations.FirstAsync(x => x.Id == locationId);
         dbLocation.Should().NotBeNull();
         dbLocation.Name.Should().Be(locationName);
@@ -124,7 +124,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbLocation.Country.Should().Be(locationCountry);
         dbLocation.Capacity.Should().Be(locationCapacity);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateLocationBecauseSuchLocationExists()
     {
@@ -149,7 +149,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateLocationBecauseLocationNotFound()
     {
@@ -174,7 +174,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldDeleteLocation()
     {
@@ -186,14 +186,14 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
+
         var responseLocation = await response.ToResponseModel<CategoryDto>();
         responseLocation.Id.Should().Be(locationId.Value);
-        
+
         var dbCategory = await Context.Locations.FirstOrDefaultAsync(x => x.Id == locationId);
         dbCategory.Should().BeNull();
     }
-    
+
     [Fact]
     public async Task ShouldNotDeleteLocationBecauseLocationNotFound()
     {
@@ -207,7 +207,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotDeleteLocationBecauseLocationHasEvents()
     {
@@ -230,7 +230,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         await Context.Categories.AddAsync(_mainCategory);
         await Context.Locations.AddRangeAsync(_mainLocation, _secondaryLocation);
         await Context.Events.AddAsync(_mainEvent);
-        
+
         await SaveChangesAsync();
     }
 
@@ -242,7 +242,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         Context.Users.RemoveRange(Context.Users);
         Context.Profiles.RemoveRange(Context.Profiles);
         Context.Roles.RemoveRange(Context.Roles);
-        
+
         await SaveChangesAsync();
     }
 }

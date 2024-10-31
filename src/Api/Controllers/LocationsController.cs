@@ -5,10 +5,12 @@ using Application.Common.Interfaces.Repositories;
 using Application.Locations.Commands;
 using Domain.Locations;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("locations")]
 [ApiController]
 public class LocationsController(ISender sender, ILocationQueries locationQueries) : ControllerBase
@@ -19,16 +21,17 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
         var entities = await locationQueries.GetAll(cancellationToken);
         return entities.Select(LocationDto.FromDomainModel).ToList();
     }
-    
+
     [HttpGet("{locationsId:guid}")]
-    public async Task<ActionResult<LocationDto>> GetById([FromRoute] Guid locationsId, CancellationToken cancellationToken)
+    public async Task<ActionResult<LocationDto>> GetById([FromRoute] Guid locationsId,
+        CancellationToken cancellationToken)
     {
         var entity = await locationQueries.GetById(new LocationId(locationsId), cancellationToken);
         return entity.Match<ActionResult<LocationDto>>(
             l => LocationDto.FromDomainModel(l),
             () => NotFound());
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<LocationDto>> Create(
         [FromBody] LocationDto request,
@@ -47,6 +50,7 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
             l => LocationDto.FromDomainModel(l),
             e => e.ToObjectResult());
     }
+
     [HttpPut]
     public async Task<ActionResult<LocationDto>> Update(
         [FromBody] LocationDto request,
@@ -66,7 +70,7 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
             l => LocationDto.FromDomainModel(l),
             e => e.ToObjectResult());
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<LocationDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {

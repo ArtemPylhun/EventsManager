@@ -7,6 +7,7 @@ using Domain.Roles;
 using Domain.Users;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Tests.Common;
@@ -17,14 +18,16 @@ namespace Api.Tests.Integration.Users;
 
 public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 {
-    private readonly Role _mainRole = RolesData.MainRole;
+    private readonly Role _userRole = RolesData.UserRole;
+    private readonly Role _adminRole = RolesData.AdminRole;
     private readonly Profile _mainProfile = ProfilesData.MainProfile;
     private readonly User _mainUser;
     private readonly User _newUser;
+
     public UsersControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
-        _mainUser = UsersData.MainUser(_mainRole.Id, _mainProfile.Id);
-        _newUser = UsersData.NewUser(_mainRole.Id);
+        _mainUser = UsersData.MainUser(_userRole.Id, _mainProfile.Id);
+        _newUser = UsersData.NewUser(_userRole.Id);
     }
 
     [Fact]
@@ -36,10 +39,10 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var password = "password";
         var request = new UserDto(
             Id: null,
-            Email: email, 
-            UserName: userName, 
-            Password: password, 
-            RoleId: _mainRole.Id.Value, 
+            Email: email,
+            UserName: userName,
+            Password: password,
+            RoleId: _userRole.Id.Value,
             Role: null);
 
         // Act
@@ -55,33 +58,33 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbUser.UserName.Should().Be(userName);
         dbUser.Email.Should().Be(email);
         dbUser.PasswordHash.Should().NotBeEmpty();
-        dbUser.RoleId.Value.Should().Be(_mainRole.Id.Value);
+        dbUser.RoleId.Value.Should().Be(_userRole.Id.Value);
         dbUser.ProfileId.Should().NotBe(ProfileId.Empty());
     }
-    
+
     [Fact]
-         public async Task ShouldNotCreateUserBecauseNameDuplicated()
-         {
-             // Arrange
-             var userName = "UserName";
-             var email = "userTestCreateName@gmail.com";
-             var password = "password";
-             var request = new UserDto(
-                 Id: null,
-                 Email: email, 
-                 UserName: userName, 
-                 Password: password, 
-                 RoleId: _mainRole.Id.Value, 
-                 Role: null);
-     
-             // Act
-             var response = await Client.PostAsJsonAsync("users", request);
-     
-             // Assert
-             response.IsSuccessStatusCode.Should().BeFalse();
-             response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-         }
-         
+    public async Task ShouldNotCreateUserBecauseNameDuplicated()
+    {
+        // Arrange
+        var userName = "UserName";
+        var email = "userTestCreateName@gmail.com";
+        var password = "password";
+        var request = new UserDto(
+            Id: null,
+            Email: email,
+            UserName: userName,
+            Password: password,
+            RoleId: _userRole.Id.Value,
+            Role: null);
+
+        // Act
+        var response = await Client.PostAsJsonAsync("users", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
     [Fact]
     public async Task ShouldNotCreateUserBecauseEmailDuplicated()
     {
@@ -91,43 +94,20 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var password = "password";
         var request = new UserDto(
             Id: null,
-            Email: email, 
-            UserName: userName, 
-            Password: password, 
-            RoleId: _mainRole.Id.Value, 
+            Email: email,
+            UserName: userName,
+            Password: password,
+            RoleId: _userRole.Id.Value,
             Role: null);
-     
+
         // Act
         var response = await Client.PostAsJsonAsync("users", request);
-     
+
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
-    
-    [Fact]
-    public async Task ShouldNotCreateUserBecauseRoleNotFound()
-    {
-        // Arrange
-        var userName = "Create User Name";
-        var email = "createUserName@gmail.com";
-        var password = "password";
-        var request = new UserDto(
-            Id: null,
-            Email: email, 
-            UserName: userName, 
-            Password: password, 
-            RoleId: RoleId.New().Value, 
-            Role: null);
-     
-        // Act
-        var response = await Client.PostAsJsonAsync("users", request);
-     
-        // Assert
-        response.IsSuccessStatusCode.Should().BeFalse();
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-    
+
     [Fact]
     public async Task ShouldUpdateUser()
     {
@@ -136,11 +116,11 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var password = "password";
         var request = new UserUpdateDto(
             Id: _mainUser.Id.Value,
-            UserName: userName, 
+            UserName: userName,
             Password: password,
             FullName: "Full Name",
-            PhoneNumber: "123456789", 
-            Address: "city Rivne", 
+            PhoneNumber: "123456789",
+            Address: "city Rivne",
             BirthDate: DateTime.UtcNow.AddYears(-19));
 
         // Act
@@ -162,7 +142,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbProfile.Address.Should().Be(_mainProfile.Address);
         dbProfile.BirthDate.Value.Date.Should().Be(_mainProfile.BirthDate.Value.Date);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateUserBecauseUserNotFound()
     {
@@ -171,39 +151,39 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var password = "password";
         var request = new UserUpdateDto(
             Id: _newUser.Id.Value,
-            UserName: userName, 
+            UserName: userName,
             Password: password,
             FullName: "Full Name",
-            PhoneNumber: "123456789", 
-            Address: "city Rivne", 
+            PhoneNumber: "123456789",
+            Address: "city Rivne",
             BirthDate: DateTime.UtcNow.AddYears(-19));
-     
+
         // Act
         var response = await Client.PutAsJsonAsync("users", request);
-     
+
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async Task ShouldNotUpdateUserBecauseUserNameDuplicated()
     {
         // Arrange
-        var userName = "User Name";
+        var userName = "UserName";
         var password = "password";
         var request = new UserUpdateDto(
             Id: _mainUser.Id.Value,
-            UserName: userName, 
-            Password: password, 
+            UserName: userName,
+            Password: password,
             FullName: "Full Name",
             PhoneNumber: "123456789",
             BirthDate: DateTime.UtcNow.AddYears(-19),
             Address: "city Rivne");
-     
+
         // Act
         var response = await Client.PutAsJsonAsync("users", request);
-     
+
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -217,12 +197,11 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Act
         var response = await Client.DeleteAsync($"users/{userId}");
-     
+
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-        
     }
-    
+
     [Fact]
     public async Task ShouldNotDeleteUserBecauseNotFound()
     {
@@ -231,17 +210,127 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         // Act
         var response = await Client.DeleteAsync($"users/{userId}");
-     
+
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-        
     }
-    
+
+    [Fact]
+    public async Task ShouldLoginUser()
+    {
+        // Arrange
+        var email = _mainUser.Email;
+        var password = "password";
+        var request = new LoginRequest
+        {
+            Email = email,
+            Password = password
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync("users/login", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeTrue();
+        var result = await response.ToResponseModel();
+        result.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ShouldNotLoginUserBecauseNotFoundByEmail()
+    {
+        // Arrange
+        var email = "notFoundEmail@gmail.com";
+        var password = "password";
+        var request = new LoginRequest
+        {
+            Email = email,
+            Password = password
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync("users/login", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task ShouldNotLoginUserBecausePasswordNotMatch()
+    {
+        // Arrange
+        var email = _mainUser.Email;
+        var password = "wrongPassword";
+        var request = new LoginRequest
+        {
+            Email = email,
+            Password = password
+        };
+
+        // Act
+        var response = await Client.PostAsJsonAsync("users/login", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task ShouldChangeUserRole()
+    {
+        // Arrange
+        var existingRole = _adminRole;
+        var request = new UpdateUserRoleDto(
+            UserId: _mainUser.Id.Value,
+            RoleId: existingRole.Id.Value);
+
+        // Act
+        var response = await Client.PutAsJsonAsync("users/setRole", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeTrue();
+        var dbUser = await Context.Users.FirstAsync(x => x.Id == _mainUser.Id);
+        dbUser.RoleId.Value.Should().Be(existingRole.Id.Value);
+    }
+
+    [Fact]
+    public async Task ShouldNotChangeUserRoleBecauseUserNotFound()
+    {
+        // Arrange
+        var existingRole = _adminRole;
+        var request = new UpdateUserRoleDto(UserId: Guid.NewGuid(),
+            RoleId: existingRole.Id.Value);
+
+        // Act
+        var response = await Client.PutAsJsonAsync("users/setRole", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task ShouldNotChangeUserRoleBecauseRoleNotFound()
+    {
+        // Arrange
+        var request = new UpdateUserRoleDto(
+            UserId: _mainUser.Id.Value,
+            RoleId: Guid.NewGuid());
+
+        // Act
+        var response = await Client.PutAsJsonAsync("users/setRole", request);
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     public async Task InitializeAsync()
     {
-        await Context.Roles.AddAsync(_mainRole);
+        await Context.Roles.AddAsync(_userRole);
+        await Context.Roles.AddAsync(_adminRole);
         await Context.Profiles.AddAsync(_mainProfile);
         await Context.Users.AddAsync(_mainUser);
 

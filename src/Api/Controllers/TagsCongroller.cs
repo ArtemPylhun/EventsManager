@@ -4,10 +4,12 @@ using Application.Common.Interfaces.Queries;
 using Application.Tags.Commands;
 using Domain.Tags;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("tags")]
 [ApiController]
 public class TagsController(ISender sender, ITagQueries facultyQueries) : ControllerBase
@@ -19,7 +21,7 @@ public class TagsController(ISender sender, ITagQueries facultyQueries) : Contro
 
         return entities.Select(TagDto.FromDomainModel).ToList();
     }
-    
+
     [HttpGet("{tagsId:guid}")]
     public async Task<ActionResult<TagDto>> GetById([FromRoute] Guid tagsId, CancellationToken cancellationToken)
     {
@@ -28,7 +30,7 @@ public class TagsController(ISender sender, ITagQueries facultyQueries) : Contro
             f => TagDto.FromDomainModel(f),
             () => NotFound());
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<TagDto>> Create(
         [FromBody] TagDto request,
@@ -63,7 +65,7 @@ public class TagsController(ISender sender, ITagQueries facultyQueries) : Contro
             f => TagDto.FromDomainModel(f),
             e => e.ToObjectResult());
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<TagDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {

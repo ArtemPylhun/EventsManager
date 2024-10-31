@@ -4,10 +4,12 @@ using Application.Categories.Commands;
 using Application.Common.Interfaces.Queries;
 using Domain.Categories;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("categories")]
 [ApiController]
 public class CategoriesController(ISender sender, ICategoryQueries categoryQueries) : ControllerBase
@@ -18,16 +20,17 @@ public class CategoriesController(ISender sender, ICategoryQueries categoryQueri
         var entities = await categoryQueries.GetAll(cancellationToken);
         return entities.Select(CategoryDto.FromDomainModel).ToList();
     }
-    
+
     [HttpGet("{categoryId:guid}")]
-    public async Task<ActionResult<CategoryDto>> GetById([FromRoute] Guid categoryId, CancellationToken cancellationToken)
+    public async Task<ActionResult<CategoryDto>> GetById([FromRoute] Guid categoryId,
+        CancellationToken cancellationToken)
     {
         var entity = await categoryQueries.GetById(new CategoryId(categoryId), cancellationToken);
         return entity.Match<ActionResult<CategoryDto>>(
             c => CategoryDto.FromDomainModel(c),
             () => NotFound());
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> Create(
         [FromBody] CategoryDto request,
@@ -43,6 +46,7 @@ public class CategoriesController(ISender sender, ICategoryQueries categoryQueri
             c => CategoryDto.FromDomainModel(c),
             e => e.ToObjectResult());
     }
+
     [HttpPut]
     public async Task<ActionResult<CategoryDto>> Update(
         [FromBody] CategoryDto request,
@@ -59,7 +63,7 @@ public class CategoriesController(ISender sender, ICategoryQueries categoryQueri
             c => CategoryDto.FromDomainModel(c),
             e => e.ToObjectResult());
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<CategoryDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {

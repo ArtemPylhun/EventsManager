@@ -8,6 +8,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Tests.Common;
 using Tests.Data;
+
 namespace Api.Tests.Integration.Roles;
 
 public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
@@ -20,7 +21,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
 
     public RolesControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
-        _mainRole = RolesData.MainRole;
+        _mainRole = RolesData.UserRole;
         _mainUser = UsersData.MainUser(_mainRole.Id, _mainProfile.Id);
     }
 
@@ -157,6 +158,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
+
     public async Task InitializeAsync()
     {
         await Context.Roles.AddAsync(_mainRole);

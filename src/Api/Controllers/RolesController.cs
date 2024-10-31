@@ -4,10 +4,12 @@ using Application.Common.Interfaces.Queries;
 using Application.Roles.Commands;
 using Domain.Roles;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("roles")]
 [ApiController]
 public class RolesController(ISender sender, IRoleQueries facultyQueries) : ControllerBase
@@ -19,7 +21,7 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
 
         return entities.Select(RoleDto.FromDomainModel).ToList();
     }
-    
+
     [HttpGet("{roleId:guid}")]
     public async Task<ActionResult<RoleDto>> GetById([FromRoute] Guid roleId, CancellationToken cancellationToken)
     {
@@ -28,7 +30,7 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
             f => RoleDto.FromDomainModel(f),
             () => NotFound());
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<RoleDto>> Create(
         [FromBody] RoleDto request,
@@ -63,7 +65,7 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
             f => RoleDto.FromDomainModel(f),
             e => e.ToObjectResult());
     }
-    
+
     [HttpDelete("{roleId:guid}")]
     public async Task<ActionResult<RoleDto>> Delete([FromRoute] Guid roleId, CancellationToken cancellationToken)
     {

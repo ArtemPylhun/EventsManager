@@ -14,7 +14,6 @@ public record CreateUserCommand : IRequest<Result<User, UserException>>
     public required string Email { get; init; }
     public required string UserName { get; init; }
     public required string Password { get; init; }
-    public required Guid RoleId { get; init; }
 }
 
 public class CreateUserCommandHandler(
@@ -27,9 +26,7 @@ public class CreateUserCommandHandler(
     public async Task<Result<User, UserException>> Handle(CreateUserCommand request,
         CancellationToken cancellationToken)
     {
-        var roleId = new RoleId(request.RoleId);
-
-        var role = await roleQueries.GetById(roleId, cancellationToken);
+        var role = await roleQueries.SearchByTitle("User", cancellationToken);
 
         return await role.Match<Task<Result<User, UserException>>>(
             async r =>
@@ -50,10 +47,11 @@ public class CreateUserCommandHandler(
                             ue => Task.FromResult<Result<User, UserException>>(
                                 new UserWithEmailAlreadyExistsException(ue.Id)),
                             async () => await CreateEntity(request.UserName, request.Email, request.Password,
-                                request.RoleId, cancellationToken));
+                                r.Id.Value, cancellationToken));
                     });
             },
-            () => Task.FromResult<Result<User, UserException>>(new UserRoleNotFoundException(UserId.Empty(), roleId)));
+            () => Task.FromResult<Result<User, UserException>>(
+                new UserRoleNotFoundException(UserId.Empty(), RoleId.Empty())));
     }
 
     private async Task<Result<User, UserException>> CreateEntity(
@@ -65,9 +63,9 @@ public class CreateUserCommandHandler(
     {
         try
         {
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
             var usersProfile = Profile.New(ProfileId.New(), null, DateTime.UtcNow, string.Empty, String.Empty);
             await profileRepository.Add(usersProfile, cancellationToken);
-            var passwordHash = password; //TODO: Password hashing 
             var entity = User.New(UserId.New(), userName, email, passwordHash, DateTime.UtcNow, new RoleId(roleId),
                 usersProfile.Id);
 
