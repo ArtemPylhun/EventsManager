@@ -30,7 +30,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
     
     [HttpPost]
     public async Task<ActionResult<EventDto>> Create(
-        [FromBody] EventCreateDto request,
+        [FromForm] EventCreateDto request,
         CancellationToken cancellationToken)
     {
         var input = new CreateEventCommand
@@ -42,6 +42,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             OrganizerId = request.OrganizerId,
             LocationId = request.LocationId,
             CategoryId = request.CategoryId,
+            Image = request.Image,
             TagsIds = request.TagsIds
         };
         var result = await sender.Send(input, cancellationToken);
@@ -51,7 +52,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
     }
     [HttpPut]
     public async Task<ActionResult<EventDto>> Update(
-        [FromBody] EventUpdateDto request,
+        [FromForm] EventUpdateDto request,
         CancellationToken cancellationToken)
     {
         var input = new UpdateEventCommand
@@ -64,6 +65,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             OrganizerId = request.OrganizerId,
             LocationId = request.LocationId,
             CategoryId = request.CategoryId,
+            Image = request.Image,
             TagsIds = request.TagsIds
         };
         var result = await sender.Send(input, cancellationToken);

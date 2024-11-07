@@ -2,6 +2,7 @@
 using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Services;
 using Application.Events.Exceptions;
 using Domain.Categories;
 using Domain.Events;
@@ -10,6 +11,7 @@ using Domain.Locations;
 using Domain.Tags;
 using Domain.Users;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Events.Commands;
 
@@ -23,6 +25,7 @@ public record CreateEventCommand : IRequest<Result<Event, EventException>>
     public required Guid LocationId { get; init; }
     public required Guid CategoryId { get; init; }
     public required IReadOnlyList<Guid> TagsIds { get; init; }
+    public required IFormFile? Image { get; init; }
 }
 
 public class CreateEventCommandHandler(
@@ -31,7 +34,8 @@ public class CreateEventCommandHandler(
     IUserQueries userQueries,
     ILocationQueries locationQueries,
     ICategoryQueries categoryQueries,
-    IEventTagRepository eventTagRepository) : IRequestHandler<CreateEventCommand, Result<Event, EventException>>
+    IEventTagRepository eventTagRepository,
+    IFileStorageService fileStorageService) : IRequestHandler<CreateEventCommand, Result<Event, EventException>>
 {
     public async Task<Result<Event, EventException>> Handle(
         CreateEventCommand request,
@@ -57,6 +61,7 @@ public class CreateEventCommandHandler(
                                     request.Description,
                                     request.StartDate,
                                     request.EndDate,
+                                    null,
                                     new UserId(request.OrganizerId),
                                     new LocationId(request.LocationId),
                                     new CategoryId(request.CategoryId));
@@ -66,7 +71,7 @@ public class CreateEventCommandHandler(
                                 return await existingEvent.Match(
                                     e => Task.FromResult<Result<Event, EventException>>
                                         (new EventAlreadyExistsException(e.Id)),
-                                    async () => await CreateEntity(entity, request.TagsIds, cancellationToken));
+                                    async () => await CreateEntity(entity, request.Image, request.TagsIds, cancellationToken));
                             },
                             () => Task.FromResult<Result<Event, EventException>>(
                                 new EventCategoryNotFoundException(EventId.Empty())));
@@ -80,11 +85,20 @@ public class CreateEventCommandHandler(
 
     private async Task<Result<Event, EventException>> CreateEntity(
         Event entity,
+        IFormFile image,
         IReadOnlyList<Guid> tags,
         CancellationToken cancellationToken)
     {
         try
         {
+            if (image != null)
+            {
+                string? imageUrl = null;
+                imageUrl = await fileStorageService.SaveFileAsync(image, "events", entity.Id.Value, cancellationToken);
+
+                entity.SetImageUrl(imageUrl);
+            }
+            
             var result = await eventRepository.Add(entity, cancellationToken);
             
             foreach (var tag in tags)

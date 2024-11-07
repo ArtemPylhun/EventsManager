@@ -48,16 +48,19 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainUser.Id;
         var locationId = _mainLocation.Id;
         var categoryId = _mainCategory.Id;
-        var request = new EventCreateDto(
-            eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            organizerId.Value,
-            locationId.Value,
-            categoryId.Value,
-            new[] { _mainTag.Id.Value });
-
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(eventTitle), "title" },
+            { new StringContent(eventDescription), "description" },
+            { new StringContent(startDate.ToString()), "startDate" },
+            { new StringContent(endDate.ToString()), "endDate" },
+            { new StringContent(organizerId.Value.ToString()), "organizerId" },
+            { new StringContent(locationId.Value.ToString()), "locationId" },
+            { new StringContent(categoryId.Value.ToString()), "categoryId" },
+            { new StringContent(_mainTag.Id.Value.ToString()), "tagsIds" }
+        };
+        request.Add(new StreamContent(new MemoryStream(new byte[] { 0 })), "image", "test.png");
+        
         // Act
         var response = await Client.PostAsJsonAsync("events", request);
 
@@ -93,6 +96,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
@@ -121,6 +125,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId,
             locationId.Value,
             categoryId.Value,
@@ -149,6 +154,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId,
             categoryId.Value,
@@ -177,6 +183,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId.Value,
             categoryId,
@@ -207,6 +214,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
@@ -250,6 +258,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId.Value,
             categoryId.Value,
@@ -280,6 +289,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId,
             locationId.Value,
             categoryId.Value,
@@ -310,6 +320,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId,
             categoryId.Value,
@@ -340,6 +351,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             eventDescription,
             startDate,
             endDate,
+            null,
             organizerId.Value,
             locationId.Value,
             categoryId,

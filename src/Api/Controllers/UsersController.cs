@@ -1,11 +1,9 @@
 using Api.Dtos;
 using Api.Modules.Errors;
 using Application.Common.Interfaces.Queries;
-using Application.Common.Interfaces.Repositories;
 using Application.Users.Commands;
 using Domain.Users;
 using MediatR;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -23,7 +21,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> LoginUser([FromBody] LoginRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> LoginUser([FromBody] UserLoginDto request, CancellationToken cancellationToken)
     {
         var input = new LoginUserCommand
         {

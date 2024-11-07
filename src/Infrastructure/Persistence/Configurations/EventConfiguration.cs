@@ -15,6 +15,7 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
         builder.Property(x => x.Id).HasConversion(x => x.Value, x => new EventId(x));
         builder.Property(x => x.Title).IsRequired().HasColumnType("varchar(255)");
         builder.Property(x => x.Description).IsRequired().HasColumnType("varchar(1000)");
+        builder.Property(x => x.ImageUrl).HasColumnType("varchar(400)");
 
         builder.Property(x => x.StartDate)
             .HasConversion(new DateTimeUtcConverter());

@@ -1,7 +1,11 @@
+using Amazon.Runtime;
+using Amazon.S3;
 using Api.Modules;
 using Api.OptionsSetup;
 using Application;
+using Application.Common.Interfaces.Services;
 using Infrastructure;
+using Infrastructure.Services.FileServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +20,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer();
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+builder.Services.AddSingleton<IFileStorageService, S3FileStorageService>();
+var awsOptions = builder.Configuration.GetAWSOptions();
+awsOptions.Credentials = new BasicAWSCredentials(
+    builder.Configuration["AWS:AccessKeyId"],
+    builder.Configuration["AWS:SecretAccessKey"]);
+
+builder.Services.AddDefaultAWSOptions(awsOptions);
+builder.Services.AddAWSService<IAmazonS3>();
 
 builder.Services.AddCors(c =>
 {

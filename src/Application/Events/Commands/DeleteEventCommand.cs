@@ -1,6 +1,7 @@
 ﻿using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Services;
 using Application.Events.Exceptions;
 using Domain.Events;
 using MediatR;
@@ -16,7 +17,8 @@ public class DeleteEventCommandHandler(
     IEventRepository eventRepository,
     IEventQueries eventQueries,
     IEventTagRepository eventTagRepository,
-    IEventTagQueries eventTagQueries) : IRequestHandler<DeleteEventCommand, Result<Event, EventException>>
+    IEventTagQueries eventTagQueries,
+    IFileStorageService fileStorageService) : IRequestHandler<DeleteEventCommand, Result<Event, EventException>>
 {
     public async Task<Result<Event, EventException>> Handle(
         DeleteEventCommand request,
@@ -36,7 +38,12 @@ public class DeleteEventCommandHandler(
     {
         try
         {
-            return await eventRepository.Delete(entity, cancellationToken);
+            var result =  await eventRepository.Delete(entity, cancellationToken);
+            if (entity.ImageUrl != null)
+            {
+                await fileStorageService.DeleteFileAsync("events", entity.Id.Value, cancellationToken);   
+            }
+            return result;
         }
         catch (Exception exception)
         {

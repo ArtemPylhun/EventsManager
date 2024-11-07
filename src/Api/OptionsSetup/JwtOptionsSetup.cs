@@ -5,7 +5,7 @@ namespace Api.OptionsSetup;
 
 public class JwtOptionsSetup : IConfigureOptions<JwtOptions>
 {
-    private const string SectionName = "Jwt";
+    private const string SectionName = "JwtOptions";
     private readonly IConfiguration _configuration;
 
     public JwtOptionsSetup(IConfiguration configuration)
