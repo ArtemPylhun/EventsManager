@@ -7,13 +7,12 @@ public record EventCreateDto(
     string Description,
     DateTime StartDate,
     DateTime EndDate,
+    IFormFile? Image,
     Guid OrganizerId,
     Guid LocationId,
     Guid CategoryId,
     IReadOnlyList<Guid> TagsIds)
-{
-    
-}
+{ }
 
 public record EventUpdateDto(
     Guid EventId,
@@ -21,6 +20,7 @@ public record EventUpdateDto(
     string Description,
     DateTime StartDate,
     DateTime EndDate,
+    IFormFile? Image,
     Guid OrganizerId,
     Guid LocationId,
     Guid CategoryId,
@@ -35,6 +35,7 @@ public record EventDto(
     string Description,
     DateTime StartDate,
     DateTime EndDate,
+    string? ImageUrl,
     Guid OrganizerId,
     Guid LocationId,
     Guid CategoryId)
@@ -46,6 +47,7 @@ public record EventDto(
             entity.Description,
             entity.StartDate,
             entity.EndDate,
+            entity.ImageUrl,
             entity.OrganizerId.Value,
             entity.LocationId.Value,
             entity.CategoryId.Value);

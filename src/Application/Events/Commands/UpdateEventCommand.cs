@@ -1,6 +1,7 @@
 ﻿using Application.Common;
 using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Services;
 using Application.Events.Exceptions;
 using Domain.Categories;
 using Domain.Events;
@@ -9,6 +10,7 @@ using Domain.Locations;
 using Domain.Tags;
 using Domain.Users;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Optional;
 
 namespace Application.Events.Commands;
@@ -24,6 +26,7 @@ public record UpdateEventCommand : IRequest<Result<Event, EventException>>
     public required Guid LocationId { get; init; }
     public required Guid CategoryId { get; init; }
     public required IReadOnlyList<Guid> TagsIds { get; init; }
+    public required IFormFile Image { get; init; }
 }
 
 public class UpdateEventCommandHandler(
@@ -34,7 +37,8 @@ public class UpdateEventCommandHandler(
     ICategoryQueries categoryQueries,
     IEventTagRepository eventTagRepository,
     IEventTagQueries eventTagQueries,
-    ITagQueries tagQueries) : IRequestHandler<UpdateEventCommand, Result<Event, EventException>>
+    ITagQueries tagQueries,
+    IFileStorageService fileStorageService) : IRequestHandler<UpdateEventCommand, Result<Event, EventException>>
 {
     public async Task<Result<Event, EventException>> Handle(
         UpdateEventCommand request,
@@ -68,6 +72,7 @@ public class UpdateEventCommandHandler(
                                             request.Description,
                                             request.StartDate,
                                             request.EndDate,
+                                            null,
                                             new UserId(request.OrganizerId),
                                             new LocationId(request.LocationId),
                                             new CategoryId(request.CategoryId));
@@ -77,7 +82,7 @@ public class UpdateEventCommandHandler(
                                         return await duplicatedEvent.Match(
                                             e => Task.FromResult<Result<Event, EventException>>
                                                 (new EventAlreadyExistsException(e.Id)),
-                                            async () => await UpdateEntity(entity,
+                                            async () => await UpdateEntity(entity, request.Image,
                                                 request.TagsIds.Select(ti => new TagId(ti)), cancellationToken));
                                     },
                                     () => Task.FromResult<Result<Event, EventException>>(
@@ -95,11 +100,19 @@ public class UpdateEventCommandHandler(
 
     private async Task<Result<Event, EventException>> UpdateEntity(
         Event entity,
+        IFormFile image,
         IEnumerable<TagId> newTagsIds,
         CancellationToken cancellationToken)
     {
         try
         {
+            if (image != null)
+            {
+                string? imageUrl = null;
+                imageUrl = await fileStorageService.SaveFileAsync(image, "events", entity.Id.Value, cancellationToken);
+                entity.SetImageUrl(imageUrl);
+            }
+
             var oldTags = await tagQueries.GetByEvent(entity.Id, cancellationToken);
             
             var tagsToRemove = new List<TagId>();

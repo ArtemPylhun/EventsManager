@@ -13,6 +13,7 @@ public class EventsData
             "Main event description",
             DateTime.UtcNow + TimeSpan.FromHours(1),
             DateTime.UtcNow + TimeSpan.FromHours(10),
+            null,
             organizerId,
             locationId,
             categoryId);
@@ -23,6 +24,7 @@ public class EventsData
             "Secondary event description",
             DateTime.UtcNow + TimeSpan.FromHours(1),
             DateTime.UtcNow + TimeSpan.FromHours(10),
+            null,
             organizerId,
             locationId,
             categoryId);

@@ -67,3 +67,9 @@ public record UpdateUserRoleDto(
             RoleId: user.RoleId.Value
         );
 }
+
+public record UserLoginDto(
+    string Email,
+    string Password)
+{
+}
