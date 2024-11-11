@@ -100,12 +100,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowOrigin");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 await app.InitializeDb();
 app.MapControllers();
-app.UseCors("AllowOrigin");
 
 app.Run();
 
