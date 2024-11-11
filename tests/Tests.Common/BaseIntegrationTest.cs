@@ -1,6 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Encodings.Web;
+using Application.Common.Interfaces;
+using Domain.Profiles;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +12,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Tests.Data;
 using Xunit;
 
 namespace Tests.Common;
@@ -16,28 +22,24 @@ public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebFact
 {
     protected readonly ApplicationDbContext Context;
     protected readonly HttpClient Client;
+    private readonly IJwtProvider _jwtProvider;
 
     protected BaseIntegrationTest(IntegrationTestWebFactory factory)
     {
         var scope = factory.Services.CreateScope();
-
         Context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        Client = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureTestServices(services =>
-                {
-                    services.AddAuthentication(defaultScheme: "TestScheme")
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                            "TestScheme", _ => { });
-                });
-            })
+        _jwtProvider = scope.ServiceProvider.GetRequiredService<IJwtProvider>();
+
+        Client = factory.WithWebHostBuilder(builder => { })
             .CreateClient(new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = false,
             });
 
+        // Use test data for generating a JWT token
+        var user = UsersData.MainUser(RolesData.AdminRole.Id, ProfileId.Empty());
         Client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue(scheme: "TestScheme");
+            new AuthenticationHeaderValue("Bearer", _jwtProvider.Generate(user, RolesData.AdminRole));
     }
 
     protected async Task<int> SaveChangesAsync()
