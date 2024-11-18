@@ -11,11 +11,11 @@ namespace Api.Tests.Integration.Tags;
 
 public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
 {
-    private readonly Tag _mainTag;
+    private readonly Tag _mainTag = TagsData.MainTag;
+    private readonly Tag _secondaryTag = TagsData.SecondaryTag;
 
     public TagsControllerTests(IntegrationTestWebFactory factory) : base(factory)
     {
-        _mainTag = TagsData.MainTag;
     }
 
     [Fact]
@@ -110,10 +110,10 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
     }
 
     [Fact]
-    public async Task ShouldNotUpdateTagBecauseDuplicated()
+    public async Task ShouldNotUpdateTagBecauseTitleDuplicated()
     {
         // Arrange
-        var tagName = _mainTag.Title;
+        var tagName = _secondaryTag.Title;
         var request = new TagDto(_mainTag.Id.Value, tagName);
 
         // Act
@@ -139,7 +139,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
     }
     public async Task InitializeAsync()
     {
-        await Context.Tags.AddAsync(_mainTag);
+        await Context.Tags.AddRangeAsync(_mainTag, _secondaryTag);
         await SaveChangesAsync();
     }
 

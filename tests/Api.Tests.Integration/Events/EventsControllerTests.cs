@@ -50,23 +50,21 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var categoryId = _mainCategory.Id;
         var request = new MultipartFormDataContent
         {
-            { new StringContent(eventTitle), "title" },
-            { new StringContent(eventDescription), "description" },
-            { new StringContent(startDate.ToString()), "startDate" },
-            { new StringContent(endDate.ToString()), "endDate" },
-            { new StringContent(organizerId.Value.ToString()), "organizerId" },
-            { new StringContent(locationId.Value.ToString()), "locationId" },
-            { new StringContent(categoryId.Value.ToString()), "categoryId" },
-            { new StringContent(_mainTag.Id.Value.ToString()), "tagsIds" }
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_mainTag.Id.Value.ToString()), "TagsIds" }
         };
-        request.Add(new StreamContent(new MemoryStream(new byte[] { 0 })), "image", "test.png");
-        
         // Act
-        var response = await Client.PostAsJsonAsync("events", request);
-
+        var response = await Client.PostAsync("events", request);
+        
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
-
+    
         var responseEvent = await response.ToResponseModel<EventDto>();
         var eventId = new EventId(responseEvent.Id);
 
@@ -74,15 +72,15 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbEvent.Should().NotBeNull();
         dbEvent.Title.Should().Be(eventTitle);
         dbEvent.Description.Should().Be(eventDescription);
-        dbEvent.StartDate.ToString("F").Should().Be(startDate.ToString("F"));
-        dbEvent.EndDate.ToString("F").Should().Be(endDate.ToString("F"));
+        dbEvent.StartDate.Should().BeSameDateAs(startDate);
+        dbEvent.EndDate.Should().BeSameDateAs(endDate);
         dbEvent.OrganizerId.Should().Be(organizerId);
         dbEvent.LocationId.Should().Be(locationId);
         dbEvent.CategoryId.Should().Be(categoryId);
     }
 
     [Fact]
-    public async Task ShouldNotCreateEventBecauseCategoryAlreadyExists()
+    public async Task ShouldNotCreateEventBecauseEventAlreadyExists()
     {
         // Arrange
         var eventTitle = _mainEvent.Title;
@@ -92,18 +90,20 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainEvent.OrganizerId;
         var locationId = _mainEvent.LocationId;
         var categoryId = _mainEvent.CategoryId;
-        var request = new EventCreateDto(eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId.Value,
-            categoryId.Value,
-            new[] { _mainTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_mainTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PostAsJsonAsync("events", request);
+        var response = await Client.PostAsync("events", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -121,18 +121,20 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = Guid.NewGuid();
         var locationId = _mainEvent.LocationId;
         var categoryId = _mainEvent.CategoryId;
-        var request = new EventCreateDto(eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId,
-            locationId.Value,
-            categoryId.Value,
-            new[] { _mainTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_mainTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PostAsJsonAsync("events", request);
+        var response = await Client.PostAsync("events", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -150,18 +152,20 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainEvent.OrganizerId;
         var locationId = Guid.NewGuid();
         var categoryId = _mainEvent.CategoryId;
-        var request = new EventCreateDto(eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId,
-            categoryId.Value,
-            new[] { _mainTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_mainTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PostAsJsonAsync("events", request);
+        var response = await Client.PostAsync("events", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -179,18 +183,20 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainEvent.OrganizerId;
         var locationId = _mainEvent.LocationId;
         var categoryId = Guid.NewGuid();
-        var request = new EventCreateDto(eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId.Value,
-            categoryId,
-            new[] { _mainTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.ToString()), "CategoryId" },
+            { new StringContent(_mainTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PostAsJsonAsync("events", request);
+        var response = await Client.PostAsync("events", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -208,20 +214,21 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainUser.Id;
         var locationId = _mainLocation.Id;
         var categoryId = _mainCategory.Id;
-        var request = new EventUpdateDto(
-            _mainEvent.Id.Value,
-            eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId.Value,
-            categoryId.Value,
-            new[] { _secondaryTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(_mainEvent.Id.Value.ToString()), "EventId" },
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_secondaryTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PutAsJsonAsync("events", request);
+        var response = await Client.PutAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -233,8 +240,8 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbEvent.Should().NotBeNull();
         dbEvent.Title.Should().Be(eventTitle);
         dbEvent.Description.Should().Be(eventDescription);
-        dbEvent.StartDate.ToString("F").Should().Be(startDate.ToString("F"));
-        dbEvent.EndDate.ToString("F").Should().Be(endDate.ToString("F"));
+        dbEvent.StartDate.Should().BeSameDateAs(startDate);
+        dbEvent.EndDate.Should().BeSameDateAs(endDate);
         dbEvent.OrganizerId.Should().Be(organizerId);
         dbEvent.LocationId.Should().Be(locationId);
         dbEvent.CategoryId.Should().Be(categoryId);
@@ -252,20 +259,21 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainUser.Id;
         var locationId = _mainLocation.Id;
         var categoryId = _mainCategory.Id;
-        var request = new EventUpdateDto(
-            Guid.NewGuid(),
-            eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId.Value,
-            categoryId.Value,
-            new[] { _secondaryTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(Guid.NewGuid().ToString()), "EventId" },
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_secondaryTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PutAsJsonAsync("events", request);
+        var response = await Client.PutAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -283,20 +291,21 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = Guid.NewGuid();
         var locationId = _mainLocation.Id;
         var categoryId = _mainCategory.Id;
-        var request = new EventUpdateDto(
-            _mainEvent.Id.Value,
-            eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId,
-            locationId.Value,
-            categoryId.Value,
-            new[] { _secondaryTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(_mainEvent.Id.Value.ToString()), "EventId" },
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_secondaryTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PutAsJsonAsync("events", request);
+        var response = await Client.PutAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -314,20 +323,21 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainUser.Id;
         var locationId = Guid.NewGuid();
         var categoryId = _mainCategory.Id;
-        var request = new EventUpdateDto(
-            _mainEvent.Id.Value,
-            eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId,
-            categoryId.Value,
-            new[] { _secondaryTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(_mainEvent.Id.Value.ToString()), "EventId" },
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.ToString()), "LocationId" },
+            { new StringContent(categoryId.Value.ToString()), "CategoryId" },
+            { new StringContent(_secondaryTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PutAsJsonAsync("events", request);
+        var response = await Client.PutAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -345,20 +355,21 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var organizerId = _mainUser.Id;
         var locationId = _mainLocation.Id;
         var categoryId = Guid.NewGuid();
-        var request = new EventUpdateDto(
-            _mainEvent.Id.Value,
-            eventTitle,
-            eventDescription,
-            startDate,
-            endDate,
-            null,
-            organizerId.Value,
-            locationId.Value,
-            categoryId,
-            new[] { _secondaryTag.Id.Value });
+        var request = new MultipartFormDataContent
+        {
+            { new StringContent(_mainEvent.Id.Value.ToString()), "EventId" },
+            { new StringContent(eventTitle), "Title" },
+            { new StringContent(eventDescription), "Description" },
+            { new StringContent(startDate.ToString("o")), "StartDate" },
+            { new StringContent(endDate.ToString("o")), "EndDate" },
+            { new StringContent(organizerId.Value.ToString()), "OrganizerId" },
+            { new StringContent(locationId.Value.ToString()), "LocationId" },
+            { new StringContent(categoryId.ToString()), "CategoryId" },
+            { new StringContent(_secondaryTag.Id.Value.ToString()), "TagsIds" }
+        };
 
         // Act
-        var response = await Client.PutAsJsonAsync("events", request);
+        var response = await Client.PutAsync("events", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
