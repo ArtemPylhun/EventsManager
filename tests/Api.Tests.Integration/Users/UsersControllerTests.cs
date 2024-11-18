@@ -14,7 +14,6 @@ using Tests.Common;
 using Tests.Data;
 
 namespace Api.Tests.Integration.Users;
-//TODO: add duplication check in update commands
 
 public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 {
@@ -140,7 +139,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbProfile.FullName.Should().Be(_mainProfile.FullName);
         dbProfile.PhoneNumber.Should().Be(_mainProfile.PhoneNumber);
         dbProfile.Address.Should().Be(_mainProfile.Address);
-        dbProfile.BirthDate.Value.Date.Should().Be(_mainProfile.BirthDate.Value.Date);
+        dbProfile.BirthDate.Should().BeSameDateAs(_mainProfile.BirthDate.Value);
     }
 
     [Fact]
@@ -345,4 +344,4 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         await SaveChangesAsync();
     }
-}
+}   

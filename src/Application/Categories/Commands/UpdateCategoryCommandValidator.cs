@@ -8,6 +8,6 @@ public class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCo
     {
         RuleFor(x=> x.CategoryId).NotEmpty();
         RuleFor(x => x.Name).MinimumLength(3).MaximumLength(255);
-        RuleFor(x => x.Description).MinimumLength(10).MaximumLength(1000);
+        RuleFor(x => x.Description).MinimumLength(5).MaximumLength(1000);
     }
 }
