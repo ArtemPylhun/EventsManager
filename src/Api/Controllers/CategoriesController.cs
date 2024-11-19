@@ -31,7 +31,7 @@ public class CategoriesController(ISender sender, ICategoryQueries categoryQueri
             () => NotFound());
     }
 
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult<CategoryDto>> Create(
         [FromBody] CategoryDto request,
         CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ public class CategoriesController(ISender sender, ICategoryQueries categoryQueri
             e => e.ToObjectResult());
     }
 
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult<CategoryDto>> Update(
         [FromBody] CategoryDto request,
         CancellationToken cancellationToken)
@@ -64,7 +64,7 @@ public class CategoriesController(ISender sender, ICategoryQueries categoryQueri
             e => e.ToObjectResult());
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete/{id:guid}")]
     public async Task<ActionResult<CategoryDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var input = new DeleteCategoryCommand

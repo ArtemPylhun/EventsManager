@@ -60,7 +60,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
             { new StringContent(_mainTag.Id.Value.ToString()), "TagsIds" }
         };
         // Act
-        var response = await Client.PostAsync("events", request);
+        var response = await Client.PostAsync("events/add", request);
         
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -103,7 +103,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PostAsync("events", request);
+        var response = await Client.PostAsync("events/add", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -134,7 +134,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PostAsync("events", request);
+        var response = await Client.PostAsync("events/add", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -165,7 +165,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PostAsync("events", request);
+        var response = await Client.PostAsync("events/add", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -196,7 +196,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PostAsync("events", request);
+        var response = await Client.PostAsync("events/add", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -228,7 +228,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PutAsync("events", request);
+        var response = await Client.PutAsync("events/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -246,7 +246,6 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbEvent.LocationId.Should().Be(locationId);
         dbEvent.CategoryId.Should().Be(categoryId);
     }
-
 
     [Fact]
     public async Task ShouldNotUpdateEventBecauseEventNotFound()
@@ -273,7 +272,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PutAsync("events", request);
+        var response = await Client.PutAsync("events/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -305,7 +304,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PutAsync("events", request);
+        var response = await Client.PutAsync("events/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -337,7 +336,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PutAsync("events", request);
+        var response = await Client.PutAsync("events/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -369,7 +368,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         };
 
         // Act
-        var response = await Client.PutAsync("events", request);
+        var response = await Client.PutAsync("events/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -383,7 +382,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var eventId = _secondaryEvent.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"events/{eventId}");
+        var response = await Client.DeleteAsync($"events/delete/{eventId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -402,7 +401,7 @@ public class EventsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var eventId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync($"events/{eventId}");
+        var response = await Client.DeleteAsync($"events/delete/{eventId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

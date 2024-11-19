@@ -28,7 +28,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             () => NotFound());
     }
     
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult<EventDto>> Create(
         [FromForm] EventCreateDto request,
         CancellationToken cancellationToken)
@@ -50,7 +50,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             ev => EventDto.FromDomainModel(ev),
             e => e.ToObjectResult());
     }
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult<EventDto>> Update(
         [FromForm] EventUpdateDto request,
         CancellationToken cancellationToken)
@@ -74,7 +74,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             e => e.ToObjectResult());
     }
     
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete/{id:guid}")]
     public async Task<ActionResult<EventDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var input = new DeleteEventCommand

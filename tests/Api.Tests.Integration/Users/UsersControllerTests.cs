@@ -45,7 +45,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             Role: null);
 
         // Act
-        var response = await Client.PostAsJsonAsync("users", request);
+        var response = await Client.PostAsJsonAsync("users/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -77,7 +77,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             Role: null);
 
         // Act
-        var response = await Client.PostAsJsonAsync("users", request);
+        var response = await Client.PostAsJsonAsync("users/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -100,7 +100,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             Role: null);
 
         // Act
-        var response = await Client.PostAsJsonAsync("users", request);
+        var response = await Client.PostAsJsonAsync("users/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -123,7 +123,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             BirthDate: DateTime.UtcNow.AddYears(-19));
 
         // Act
-        var response = await Client.PutAsJsonAsync("users", request);
+        var response = await Client.PutAsJsonAsync("users/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -158,7 +158,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             BirthDate: DateTime.UtcNow.AddYears(-19));
 
         // Act
-        var response = await Client.PutAsJsonAsync("users", request);
+        var response = await Client.PutAsJsonAsync("users/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -181,7 +181,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             Address: "city Rivne");
 
         // Act
-        var response = await Client.PutAsJsonAsync("users", request);
+        var response = await Client.PutAsJsonAsync("users/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -195,7 +195,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var userId = _mainUser.Id.Value;
 
         // Act
-        var response = await Client.DeleteAsync($"users/{userId}");
+        var response = await Client.DeleteAsync($"users/delete/{userId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -208,7 +208,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var userId = _newUser.Id.Value;
 
         // Act
-        var response = await Client.DeleteAsync($"users/{userId}");
+        var response = await Client.DeleteAsync($"users/delete/{userId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

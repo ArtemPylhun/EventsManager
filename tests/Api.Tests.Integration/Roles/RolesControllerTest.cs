@@ -33,7 +33,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new RoleDto(Guid.NewGuid(), roleName);
 
         // Act
-        var response = await Client.PostAsJsonAsync("roles", request);
+        var response = await Client.PostAsJsonAsync("roles/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -54,7 +54,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new RoleDto(Guid.NewGuid(), roleName);
 
         // Act
-        var response = await Client.PostAsJsonAsync("roles", request);
+        var response = await Client.PostAsJsonAsync("roles/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -68,7 +68,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var roleId = _noUsersRole.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"roles/{roleId}");
+        var response = await Client.DeleteAsync($"roles/delete/{roleId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -87,7 +87,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var roleId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync($"roles/{roleId}");
+        var response = await Client.DeleteAsync($"roles/delete/{roleId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -101,7 +101,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var roleId = _mainRole.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"roles/{roleId}");
+        var response = await Client.DeleteAsync($"roles/delete/{roleId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -116,7 +116,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new RoleDto(_mainRole.Id.Value, newRoleTitle);
 
         // Act
-        var response = await Client.PutAsJsonAsync("roles", request);
+        var response = await Client.PutAsJsonAsync("roles/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -137,7 +137,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new RoleDto(roleId, "Updated role title");
 
         // Act
-        var response = await Client.PutAsJsonAsync("roles", request);
+        var response = await Client.PutAsJsonAsync("roles/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -152,7 +152,7 @@ public class RolesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new RoleDto(_mainRole.Id.Value, roleName);
 
         // Act
-        var response = await Client.PutAsJsonAsync("roles", request);
+        var response = await Client.PutAsJsonAsync("roles/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

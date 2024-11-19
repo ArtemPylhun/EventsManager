@@ -46,7 +46,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             () => NotFound());
     }
 
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto request,
         CancellationToken cancellationToken)
     {
@@ -64,7 +64,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             e => e.ToObjectResult());
     }
 
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult<UserDto>> Update([FromBody] UserUpdateDto request,
         CancellationToken cancellationToken)
     {
@@ -103,7 +103,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             e => e.ToObjectResult());
     }
 
-    [HttpDelete("{userId:guid}")]
+    [HttpDelete("delete/{userId:guid}")]
     public async Task<ActionResult<UserDto>> Delete([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         var input = new DeleteUserCommand
