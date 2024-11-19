@@ -31,7 +31,7 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
             () => NotFound());
     }
 
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult<RoleDto>> Create(
         [FromBody] RoleDto request,
         CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
             e => e.ToObjectResult());
     }
 
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult<RoleDto>> Update(
         [FromBody] RoleDto request,
         CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ public class RolesController(ISender sender, IRoleQueries facultyQueries) : Cont
             e => e.ToObjectResult());
     }
 
-    [HttpDelete("{roleId:guid}")]
+    [HttpDelete("delete/{roleId:guid}")]
     public async Task<ActionResult<RoleDto>> Delete([FromRoute] Guid roleId, CancellationToken cancellationToken)
     {
         var input = new DeleteRoleCommand

@@ -26,7 +26,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new TagDto(Guid.NewGuid(), tagName);
 
         // Act
-        var response = await Client.PostAsJsonAsync("tags", request);
+        var response = await Client.PostAsJsonAsync("tags/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -47,7 +47,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new TagDto(Guid.NewGuid(), tagName);
 
         // Act
-        var response = await Client.PostAsJsonAsync("tags", request);
+        var response = await Client.PostAsJsonAsync("tags/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -61,7 +61,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var tagId = _mainTag.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"tags/{tagId}");
+        var response = await Client.DeleteAsync($"tags/delete/{tagId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -80,7 +80,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var tagId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync($"tags/{tagId}");
+        var response = await Client.DeleteAsync($"tags/delete/{tagId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -96,7 +96,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new TagDto(_mainTag.Id.Value, tagName);
 
         // Act
-        var response = await Client.PutAsJsonAsync("tags", request);
+        var response = await Client.PutAsJsonAsync("tags/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -117,7 +117,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new TagDto(_mainTag.Id.Value, tagName);
 
         // Act
-        var response = await Client.PutAsJsonAsync("tags", request);
+        var response = await Client.PutAsJsonAsync("tags/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -131,7 +131,7 @@ public class TagsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new TagDto(Guid.NewGuid(), tagName);
 
         // Act
-        var response = await Client.PutAsJsonAsync("tags", request);
+        var response = await Client.PutAsJsonAsync("tags/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

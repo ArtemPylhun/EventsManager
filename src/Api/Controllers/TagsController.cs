@@ -31,7 +31,7 @@ public class TagsController(ISender sender, ITagQueries facultyQueries) : Contro
             () => NotFound());
     }
 
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult<TagDto>> Create(
         [FromBody] TagDto request,
         CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public class TagsController(ISender sender, ITagQueries facultyQueries) : Contro
             e => e.ToObjectResult());
     }
 
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult<TagDto>> Update(
         [FromBody] TagDto request,
         CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ public class TagsController(ISender sender, ITagQueries facultyQueries) : Contro
             e => e.ToObjectResult());
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete/{id:guid}")]
     public async Task<ActionResult<TagDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var input = new DeleteTagCommand

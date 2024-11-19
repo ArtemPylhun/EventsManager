@@ -32,7 +32,7 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
             () => NotFound());
     }
 
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult<LocationDto>> Create(
         [FromBody] LocationDto request,
         CancellationToken cancellationToken)
@@ -51,7 +51,7 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
             e => e.ToObjectResult());
     }
 
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult<LocationDto>> Update(
         [FromBody] LocationDto request,
         CancellationToken cancellationToken)
@@ -71,7 +71,7 @@ public class LocationsController(ISender sender, ILocationQueries locationQuerie
             e => e.ToObjectResult());
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete/{id:guid}")]
     public async Task<ActionResult<LocationDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var input = new DeleteLocationCommand

@@ -39,7 +39,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new CategoryDto(Guid.NewGuid(), categoryName, categoryDescription);
 
         // Act
-        var response = await Client.PostAsJsonAsync("categories", request);
+        var response = await Client.PostAsJsonAsync("categories/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -62,7 +62,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new CategoryDto(Guid.NewGuid(), categoryName, categoryDescription);
 
         // Act
-        var response = await Client.PostAsJsonAsync("categories", request);
+        var response = await Client.PostAsJsonAsync("categories/add", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -78,7 +78,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new CategoryDto(_mainCategory.Id.Value, categoryName, categoryDescription);
 
         // Act
-        var response = await Client.PutAsJsonAsync("categories", request);
+        var response = await Client.PutAsJsonAsync("categories/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -101,7 +101,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new CategoryDto(_mainCategory.Id.Value, categoryName, categoryDescription);
 
         // Act
-        var response = await Client.PutAsJsonAsync("categories", request);
+        var response = await Client.PutAsJsonAsync("categories/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -117,7 +117,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var request = new CategoryDto(Guid.NewGuid(), categoryName, categoryDescription);
 
         // Act
-        var response = await Client.PutAsJsonAsync("categories", request);
+        var response = await Client.PutAsJsonAsync("categories/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -131,7 +131,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var categoryId = _secondaryCategory.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"categories/{categoryId}");
+        var response = await Client.DeleteAsync($"categories/delete/{categoryId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -150,7 +150,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var categoryId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync($"categories/{categoryId}");
+        var response = await Client.DeleteAsync($"categories/delete/{categoryId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -164,7 +164,7 @@ public class CategoriesControllerTests : BaseIntegrationTest, IAsyncLifetime
         var categoryId = _mainCategory.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"categories/{categoryId}");
+        var response = await Client.DeleteAsync($"categories/delete/{categoryId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

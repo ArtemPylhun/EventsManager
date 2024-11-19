@@ -48,7 +48,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
             locationCapacity);
 
         // Act
-        var response = await Client.PostAsJsonAsync("locations", request);
+        var response = await Client.PostAsJsonAsync("locations/add", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -83,7 +83,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
             locationCapacity);
 
         // Act
-        var response = await Client.PostAsJsonAsync("locations", request);
+        var response = await Client.PostAsJsonAsync("locations/add", request);
 
         // Assert 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -108,7 +108,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
             locationCapacity);
 
         // Act
-        var response = await Client.PutAsJsonAsync("locations", request);
+        var response = await Client.PutAsJsonAsync("locations/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -143,7 +143,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
             locationCapacity);
 
         // Act
-        var response = await Client.PutAsJsonAsync("locations", request);
+        var response = await Client.PutAsJsonAsync("locations/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -168,7 +168,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
             locationCapacity);
 
         // Act
-        var response = await Client.PutAsJsonAsync("locations", request);
+        var response = await Client.PutAsJsonAsync("locations/update", request);
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -182,7 +182,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var locationId = _secondaryLocation.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"locations/{locationId}");
+        var response = await Client.DeleteAsync($"locations/delete/{locationId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -201,7 +201,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var locationId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync($"locations/{locationId}");
+        var response = await Client.DeleteAsync($"locations/delete/{locationId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -215,7 +215,7 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var locationId = _mainLocation.Id;
 
         // Act
-        var response = await Client.DeleteAsync($"locations/{locationId}");
+        var response = await Client.DeleteAsync($"locations/delete/{locationId}");
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();
