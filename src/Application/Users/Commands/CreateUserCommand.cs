@@ -23,10 +23,12 @@ public class CreateUserCommandHandler(
     IProfileRepository profileRepository)
     : IRequestHandler<CreateUserCommand, Result<User, UserException>>
 {
+    private readonly string _roleTitle = "User";
+
     public async Task<Result<User, UserException>> Handle(CreateUserCommand request,
         CancellationToken cancellationToken)
     {
-        var role = await roleQueries.SearchByTitle("User", cancellationToken);
+        var role = await roleQueries.SearchByTitle(_roleTitle, cancellationToken);
 
         return await role.Match<Task<Result<User, UserException>>>(
             async r =>
