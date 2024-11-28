@@ -46,7 +46,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             () => NotFound());
     }
 
-    [HttpPost("add")]
+    [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto request,
         CancellationToken cancellationToken)
     {
