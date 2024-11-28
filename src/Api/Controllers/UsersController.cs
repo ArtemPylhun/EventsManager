@@ -117,4 +117,38 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             u => UserDto.FromDomainModel(u),
             e => e.ToObjectResult());
     }
+
+    [HttpPost("registerToEvent/{eventId:guid}")]
+    public async Task<ActionResult<AttendanceRegisterDto>> RegisterToEvent([FromRoute] Guid eventId,
+        [FromQuery] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var input = new RegisterUserToEventCommand
+        {
+            UserId = userId,
+            EventId = eventId
+        };
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult<AttendanceRegisterDto>>(
+            u => AttendanceRegisterDto.FromDomainModel(u),
+            e => e.ToObjectResult());
+    }
+
+    [HttpDelete("unregisterFromEvent/{eventId:guid}")]
+    public async Task<ActionResult<AttendanceUnregisterDto>> UnregisterFromEvent([FromRoute] Guid eventId,
+        [FromQuery] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var input = new UnregisterUserFromEventCommand
+        {
+            UserId = userId,
+            EventId = eventId
+        };
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult<AttendanceUnregisterDto>>(
+            u => AttendanceUnregisterDto.FromDomainModel(u),
+            e => e.ToObjectResult());
+    }
 }

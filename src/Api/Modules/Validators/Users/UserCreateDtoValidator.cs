@@ -1,10 +1,11 @@
+﻿using Api.Dtos;
 using FluentValidation;
 
-namespace Application.Users.Commands;
+namespace Api.Modules.Validators.Users;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public class UserCreateDtoValidator : AbstractValidator<UserCreateDto>
 {
-    public CreateUserCommandValidator()
+    public UserCreateDtoValidator()
     {
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.UserName).NotEmpty().MinimumLength(3).MaximumLength(255);

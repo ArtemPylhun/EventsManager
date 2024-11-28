@@ -11,15 +11,16 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
     public async Task<IReadOnlyList<User>> GetAll(CancellationToken cancellationToken)
     {
         return await context.Users
-            .AsNoTracking().Include(x => x.Profile)
+            .Include(x => x.Profile)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 
     public async Task<Option<User>> GetById(UserId id, CancellationToken cancellationToken)
     {
         var entity = await context.Users
-            .AsNoTracking()
             .Include(x => x.Profile)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         return entity == null ? Option.None<User>() : Option.Some(entity);

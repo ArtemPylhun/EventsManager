@@ -1,4 +1,5 @@
-﻿using Domain.Profiles;
+﻿using Domain.Events;
+using Domain.Profiles;
 using Domain.Roles;
 using Domain.Users;
 
@@ -27,3 +28,18 @@ public class InvalidCredentialsException() : UserException(UserId.Empty(), $"Inv
 
 public class UserUnknownException(UserId id, Exception innerException)
     : UserException(id, $"Unknown exception for the User under id: {id}!", innerException);
+
+public class UserEventDateHasPassed(UserId id, EventId eventId)
+    : UserException(id, $"Event with such id: {eventId} has already passed!");
+
+public class UserEventHasAlreadyStarted(UserId id, EventId eventId)
+    : UserException(id, $"Event with such id: {eventId} has already started!");
+
+public class UserEventNotFoundException(UserId id, EventId eventId)
+    : UserException(id, $"Event with such id: {eventId} was not found!");
+
+public class UserEventAlreadyRegistered(UserId id, EventId eventId)
+    : UserException(id, $"User has already registered to the event with such id: {eventId}!");
+
+public class UserAttendanceNotFound(UserId id, EventId eventId)
+    : UserException(id, $"User has not registered to the event with such id: {eventId}!");
