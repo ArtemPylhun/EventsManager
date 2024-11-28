@@ -11,7 +11,7 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
     public async Task<IReadOnlyList<User>> GetAll(CancellationToken cancellationToken)
     {
         return await context.Users
-            .AsNoTracking()
+            .AsNoTracking().Include(x => x.Profile)
             .ToListAsync(cancellationToken);
     }
 
@@ -47,10 +47,12 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
     public async Task<User> Add(User user, CancellationToken cancellationToken)
     {
         await context.Users.AddAsync(user, cancellationToken);
-
         await context.SaveChangesAsync(cancellationToken);
-
-        return user;
+        var newUser = await context.Users
+            .AsNoTracking()
+            .Include(x => x.Profile)
+            .FirstAsync(x => x.Id == user.Id, cancellationToken);
+        return newUser;
     }
 
     public async Task<User> Update(User user, CancellationToken cancellationToken)
@@ -59,7 +61,12 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository, IUs
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return user;
+        var newUser = await context.Users
+            .AsNoTracking()
+            .Include(x => x.Profile)
+            .FirstAsync(x => x.Id == user.Id, cancellationToken);
+
+        return newUser;
     }
 
     public async Task<User> Delete(User user, CancellationToken cancellationToken)
