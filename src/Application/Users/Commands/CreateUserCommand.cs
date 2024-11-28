@@ -66,11 +66,10 @@ public class CreateUserCommandHandler(
         try
         {
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
-            var usersProfile = Profile.New(ProfileId.New(), null, DateTime.UtcNow, string.Empty, String.Empty);
+            var usersProfile = Profile.New(ProfileId.New(), String.Empty, DateTime.UtcNow, String.Empty, String.Empty);
             await profileRepository.Add(usersProfile, cancellationToken);
             var entity = User.New(UserId.New(), userName, email, passwordHash, DateTime.UtcNow, new RoleId(roleId),
                 usersProfile.Id);
-
             return await userRepository.Add(entity, cancellationToken);
         }
         catch (Exception exception)

@@ -21,6 +21,7 @@ public record UserDto(
     string? Email,
     string? UserName,
     string? Password,
+    ProfileDto? Profile,
     Guid? RoleId,
     RoleDto? Role)
 {
@@ -30,6 +31,7 @@ public record UserDto(
             Email: user.Email,
             UserName: user.UserName,
             Password: user.PasswordHash,
+            Profile: user.Profile == null ? null : ProfileDto.FromDomainModel(user.Profile),
             RoleId: user.RoleId.Value,
             Role: user.Role == null ? null : RoleDto.FromDomainModel(user.Role));
 }

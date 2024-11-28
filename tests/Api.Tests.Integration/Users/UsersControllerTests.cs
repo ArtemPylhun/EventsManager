@@ -42,7 +42,8 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             UserName: userName,
             Password: password,
             RoleId: _userRole.Id.Value,
-            Role: null);
+            Role: null,
+            Profile: null);
 
         // Act
         var response = await Client.PostAsJsonAsync("users/register", request);
@@ -74,7 +75,8 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             UserName: userName,
             Password: password,
             RoleId: _userRole.Id.Value,
-            Role: null);
+            Role: null,
+            Profile: null);
 
         // Act
         var response = await Client.PostAsJsonAsync("users/register", request);
@@ -97,7 +99,8 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
             UserName: userName,
             Password: password,
             RoleId: _userRole.Id.Value,
-            Role: null);
+            Role: null,
+            Profile: null);
 
         // Act
         var response = await Client.PostAsJsonAsync("users/register", request);
@@ -344,4 +347,4 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         await SaveChangesAsync();
     }
-}   
+}
