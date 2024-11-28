@@ -1,12 +1,14 @@
+﻿using System.Runtime.InteropServices.JavaScript;
+using Api.Dtos;
 using FluentValidation;
 
-namespace Application.Users.Commands;
+namespace Api.Modules.Validators.Users;
 
-public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
+public class UserUpdateDtoValidator : AbstractValidator<UserUpdateDto>
 {
-    public UpdateUserCommandValidator()
+    public UserUpdateDtoValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.Id)
             .NotEmpty();
 
         RuleFor(u => u.UserName)

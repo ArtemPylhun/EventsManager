@@ -190,8 +190,8 @@ public class LocationsControllerTests : BaseIntegrationTest, IAsyncLifetime
         var responseLocation = await response.ToResponseModel<CategoryDto>();
         responseLocation.Id.Should().Be(locationId.Value);
 
-        var dbCategory = await Context.Locations.FirstOrDefaultAsync(x => x.Id == locationId);
-        dbCategory.Should().BeNull();
+        var dbLocation = await Context.Locations.FirstOrDefaultAsync(x => x.Id == locationId);
+        dbLocation.Should().BeNull();
     }
 
     [Fact]

@@ -14,7 +14,6 @@ public record UpdateUserRoleCommand : IRequest<Result<User, UserException>>
     public required Guid RoleId { get; init; }
 }
 
-//TODO: tests changeUserRole
 public class ChangeUserRoleCommandHandler(
     IUserRepository userRepository,
     IUserQueries userQueries,

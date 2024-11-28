@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+﻿using Api.Dtos;
+using FluentValidation;
 
-namespace Application.Users.Commands;
+namespace Api.Modules.Validators.Users;
 
-public class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
+public class UserLoginDtoValidator : AbstractValidator<UserLoginDto>
 {
-    public LoginUserCommandValidator()
+    public UserLoginDtoValidator()
     {
         RuleFor(u => u.Email)
             .NotEmpty()
