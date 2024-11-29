@@ -64,8 +64,9 @@ public class UpdateUserCommandHandler(
     {
         try
         {
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
             profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
-            entity.UpdateDetails(userName, entity.Email, password);
+            entity.UpdateDetails(userName, entity.Email, passwordHash);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)

@@ -57,4 +57,9 @@ public class Event
     {
         ImageUrl = imageUrl;
     }
+
+    public void Finish()
+    {
+        EndDate = DateTime.UtcNow;
+    }
 }
