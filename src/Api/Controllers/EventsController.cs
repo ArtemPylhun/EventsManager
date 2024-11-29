@@ -3,6 +3,7 @@ using Api.Modules.Errors;
 using Application.Common.Interfaces.Queries;
 using Application.Events.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using EventId = Domain.Events.EventId;
 
@@ -12,6 +13,7 @@ namespace Api.Controllers;
 [ApiController]
 public class EventsController(ISender sender, IEventQueries eventQueries) : ControllerBase
 {
+
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<EventDto>>> GetAll(CancellationToken cancellationToken)
     {
@@ -28,6 +30,7 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             () => NotFound());
     }
     
+    [Authorize(Roles = "Admin,User")]
     [HttpPost("add")]
     public async Task<ActionResult<EventDto>> Create(
         [FromForm] EventCreateDto request,
@@ -50,6 +53,8 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             ev => EventDto.FromDomainModel(ev),
             e => e.ToObjectResult());
     }
+    
+    [Authorize(Roles = "Admin,User")]
     [HttpPut("update")]
     public async Task<ActionResult<EventDto>> Update(
         [FromForm] EventUpdateDto request,
@@ -74,6 +79,23 @@ public class EventsController(ISender sender, IEventQueries eventQueries) : Cont
             e => e.ToObjectResult());
     }
     
+    [Authorize(Roles = "Admin,User")]
+    [HttpPut("cancel/{eventId:guid}")]
+    public async Task<ActionResult<EventDto>> Update(
+        [FromRoute] Guid eventId,
+        CancellationToken cancellationToken)
+    {
+        var input = new CancelEventCommand
+        {
+            EventId = eventId
+        };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<EventDto>>(
+            ev => EventDto.FromDomainModel(ev),
+            e => e.ToObjectResult());
+    }
+    
+    [Authorize(Roles = "Admin,User")]
     [HttpDelete("delete/{id:guid}")]
     public async Task<ActionResult<EventDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {

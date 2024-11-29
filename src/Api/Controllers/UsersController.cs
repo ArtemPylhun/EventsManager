@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Queries;
 using Application.Users.Commands;
 using Domain.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -86,6 +87,7 @@ public class UsersController(ISender sender, IUserQueries userQueries) : Control
             e => e.ToObjectResult());
     }
 
+    [Authorize (Roles = "Admin")]
     [HttpPut("setRole")]
     public async Task<ActionResult<UserDto>> UpdateRole([FromBody] UpdateUserRoleDto request,
         CancellationToken cancellationToken)

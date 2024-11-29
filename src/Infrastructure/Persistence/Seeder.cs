@@ -135,12 +135,12 @@ public static class Seeder
                 UserId.New(),
                 users[1].UserName,
                 users[1].Email,
-                "$2a$10$wfCl9iMbmOfhOLpLvV4xuestmdDkgt7bllY9iAW2/mdDO//5arf9.",
+                "$2a$10$ex9P8H./JZ.D4EyJf9XEYO42C8DEvDm6ZViDWV0PSpe3tK7u41r7O",
                 DateTime.UtcNow,
                 userRole.Id,
                 userProfileId
             );
-            //pass User!23
+            //pass User!2345
             var userProfile = Profile.New(
                 userProfileId,
                 $"{userUser.UserName} Profile",
