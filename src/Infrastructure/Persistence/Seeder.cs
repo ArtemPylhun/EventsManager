@@ -1,116 +1,292 @@
-﻿/*using Domain;
-using Domain.Courses;
-using Domain.Faculties;
-using Domain.JoinEntities;
+﻿using Domain;
+using Domain.Attendances;
+using Domain.Attendencies;
+using Domain.Categories;
+using Domain.Events;
+using Domain.EventsTags;
+using Domain.Locations;
+using Domain.Profiles;
+using Domain.Roles;
+using Domain.Tags;
 using Domain.Users;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace Infrastructure.Persistence;
 
 public static class Seeder
 {
-    private static HttpClient _httpClient = new();
+    public static async Task SeedRoles(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    public static async Task SeedUsers(this IApplicationBuilder app, int count)
+        if (!context.Roles.Any())
+        {
+            var roles = new[]
+            {
+                "Admin",
+                "User"
+            };
+
+            foreach (var role in roles)
+                await context.Roles.AddAsync(Role.New(RoleId.New(), role));
+
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public static async Task SeedLocations(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (!context.Locations.Any())
+        {
+            var locations = new[]
+            {
+                ("Main Conference Hall", "123 Tech St", "TechCity", "Techland", 500),
+                ("Outdoor Arena", "456 Play St", "Playtown", "Sportsland", 1000),
+                ("Virtual Space", "Online", "N/A", "Global", int.MaxValue)
+            };
+
+            foreach (var (name, address, city, country, capacity) in locations)
+            {
+                await context.Locations.AddAsync(Location.New(LocationId.New(), name, address, city, country,
+                    capacity));
+            }
+
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public static async Task SeedCategories(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (!context.Categories.Any())
+        {
+            var categories = new[]
+            {
+                new { Name = "Technology", Description = "Events related to technology and innovation" },
+                new { Name = "Art", Description = "Creative and artistic events" },
+                new { Name = "Science", Description = "Scientific discussions and experiments" },
+                new { Name = "Sports", Description = "Athletic competitions and games" },
+                new { Name = "Education", Description = "Workshops and educational activities" }
+            };
+
+            foreach (var category in categories)
+                await context.Categories.AddAsync(Category.New(CategoryId.New(), category.Name, category.Description));
+
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public static async Task SeedUsers(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         if (!context.Users.Any())
         {
-            var randomUserResponse = await _httpClient.GetAsync($"https://randomuser.me/api/?inc=name&results={count}");
-
-            if (randomUserResponse.IsSuccessStatusCode)
+            var roles = await context.Roles.ToListAsync();
+            Random rand = new Random();
+            var users = new[]
             {
-                var randomUserResponseContent = await randomUserResponse.Content.ReadAsStringAsync();
+                new { UserName = "admin", Email = "admin@example.com", Role = "Admin" },
+                new { UserName = "user", Email = "user@example.com", Role = "User" }
+            };
 
-                var randomUser = JsonConvert.DeserializeObject<dynamic>(randomUserResponseContent);
+            var adminRole = roles.FirstOrDefault(r => r.Title == users[0].Role);
+            var userRole = roles.FirstOrDefault(r => r.Title == users[1].Role);
 
-                var faculties = await context.Faculties.ToListAsync();
+            if (adminRole == null || userRole == null)
+                throw new InvalidOperationException("Roles must be seeded before creating Users.");
 
-                if (randomUser is not null)
-                    foreach (var user in randomUser.results)
-                        await context.Users.AddAsync(User.New(UserId.New(), user.name.first, user.name.last, faculties.OrderBy(f => Guid.NewGuid()).First().Id));
+            var adminProfileId = ProfileId.New();
+
+
+            var adminUser = User.New(
+                UserId.New(),
+                users[0].UserName,
+                users[0].Email,
+                "$2a$10$N4EZAC79lQBnWB2UsFe0j.t1sJsb1Us.2lPlQ5kxXbGElCMfqheIK",
+                DateTime.UtcNow,
+                adminRole.Id,
+                adminProfileId
+            );
+
+            var adminProfile = Profile.New(
+                adminProfileId,
+                $"{adminUser.UserName} Profile",
+                DateTime.UtcNow.AddYears(rand.Next(-50, -18)),
+                "+123456789",
+                "122413 Admin Address"
+            );
+            //pass Admin!23
+            await context.Users.AddAsync(adminUser);
+            await context.Profiles.AddAsync(adminProfile);
+
+            var userProfileId = ProfileId.New();
+
+            var userUser = User.New(
+                UserId.New(),
+                users[1].UserName,
+                users[1].Email,
+                "$2a$10$wfCl9iMbmOfhOLpLvV4xuestmdDkgt7bllY9iAW2/mdDO//5arf9.",
+                DateTime.UtcNow,
+                userRole.Id,
+                userProfileId
+            );
+            //pass User!23
+            var userProfile = Profile.New(
+                userProfileId,
+                $"{userUser.UserName} Profile",
+                DateTime.UtcNow.AddYears(rand.Next(-50, -18)),
+                "+123456789",
+                "1243 User Address"
+            );
+
+
+            await context.Users.AddAsync(userUser);
+            await context.Profiles.AddAsync(userProfile);
+
+
+            await context.SaveChangesAsync();
+        }
+    }
+
+
+    public static async Task SeedEvents(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (!context.Events.Any())
+        {
+            var categories = await context.Categories.ToListAsync();
+            var locations = await context.Locations.ToListAsync();
+            var users = await context.Users.ToListAsync();
+
+            if (!users.Any() || !categories.Any() || !locations.Any())
+                throw new InvalidOperationException(
+                    "Users, Categories, or Locations must be seeded before creating Events.");
+
+            var events = new[]
+            {
+                new
+                {
+                    Title = "AI Conference", Description = "Explore the future of AI",
+                    StartDate = DateTime.UtcNow.AddDays(10), EndDate = DateTime.UtcNow.AddDays(12)
+                },
+                new
+                {
+                    Title = "Painting Workshop", Description = "Learn the art of painting",
+                    StartDate = DateTime.UtcNow.AddDays(5), EndDate = DateTime.UtcNow.AddDays(7)
+                },
+                new
+                {
+                    Title = "Science Fair", Description = "Showcasing scientific achievements",
+                    StartDate = DateTime.UtcNow.AddMonths(1), EndDate = DateTime.UtcNow.AddMonths(1).AddDays(2)
+                }
+            };
+
+            foreach (var ev in events)
+            {
+                var randomCategory = categories.OrderBy(c => Guid.NewGuid()).First();
+                var randomLocation = locations.OrderBy(l => Guid.NewGuid()).First();
+                var randomOrganizer = users.OrderBy(u => Guid.NewGuid()).First();
+                await context.Events.AddAsync(Event.New(
+                    EventId.New(),
+                    ev.Title,
+                    ev.Description,
+                    ev.StartDate,
+                    ev.EndDate,
+                    null,
+                    randomOrganizer.Id,
+                    randomLocation.Id,
+                    randomCategory.Id));
             }
 
             await context.SaveChangesAsync();
         }
     }
 
-    public static async Task SeedFaculties(this IApplicationBuilder app)
+    public static async Task SeedAttendances(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        if (!context.Faculties.Any())
+        if (!context.Attendances.Any())
         {
-            var faculties = new[]
+            var events = await context.Events.ToListAsync();
+            var users = await context.Users.ToListAsync();
+
+            if (events.Any() && users.Any())
             {
-                "Faculty of Computer Science",
-                "Faculty of Economics",
-                "Faculty of Physics",
-                "Faculty of Mathematics",
-                "Faculty of Philosophy",
-                "Faculty of Biology",
-                "Faculty of Chemistry",
-                "Faculty of History",
-                "Faculty of Law",
-                "Faculty of Linguistics",
-                "Faculty of Pedagogy",
-                "Faculty of Psychology",
-                "Faculty of Sociology"
-            };
+                foreach (var user in users)
+                {
+                    var randomEvent = events.OrderBy(_ => Guid.NewGuid()).First();
+                    await context.Attendances.AddAsync(Attendance.New(
+                        AttendanceId.New(),
+                        user.Id,
+                        randomEvent.Id,
+                        DateTime.UtcNow
+                    ));
+                }
 
-            foreach (var faculty in faculties)
-                await context.Faculties.AddAsync(Faculty.New(FacultyId.New(), faculty));
-
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+            }
         }
     }
 
-
-    public static async Task SeedCoursesAndUserCourses(this IApplicationBuilder app)
+    public static async Task SeedTags(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        if (!context.Courses.Any())
+        if (!context.Tags.Any())
         {
-            var courses = new[]
+            var tags = new[]
             {
-                "Algorithms",
-                "Database Management",
-                "Computer Networks",
-                "Operating Systems",
-                "Programming",
-                "Calculus",
-                "Linear Algebra",
-                "Statistics",
-                "Physics",
-                "Chemistry",
-                "Biology",
-                "History"
+                "AI",
+                "Fitness",
+                "Gaming",
+                "Mental Health",
+                "Programming"
             };
 
-            foreach (var course in courses)
-                await context.Courses.AddAsync(Course.New(CourseId.New(), course));
-
-            await context.SaveChangesAsync();
-
-            var randomUsers = await context.Users.ToListAsync();
-            var randomCourses = await context.Courses.ToListAsync();
-
-            foreach (var user in randomUsers)
+            foreach (var tag in tags)
             {
-                var randomCourse = randomCourses.OrderBy(c => Guid.NewGuid()).First();
-                await context.UserCourses.AddAsync(UserCourse.New(user.Id, randomCourse.Id));
+                await context.Tags.AddAsync(Tag.New(TagId.New(), tag));
             }
 
             await context.SaveChangesAsync();
         }
     }
-}*/
 
+    public static async Task SeedEventTags(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (!context.EventsTags.Any())
+        {
+            var events = await context.Events.ToListAsync();
+            var tags = await context.Tags.ToListAsync();
+
+            if (events.Any() && tags.Any())
+            {
+                foreach (var evnt in events)
+                {
+                    var randomTag = tags.OrderBy(_ => Guid.NewGuid()).First();
+                    await context.EventsTags.AddAsync(EventTag.New(EventTagId.New(), evnt.Id, randomTag.Id));
+                }
+
+                await context.SaveChangesAsync();
+            }
+        }
+    }
+}
