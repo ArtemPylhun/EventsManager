@@ -162,7 +162,7 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         var dbProfile = await Context.Profiles.FirstAsync(x => x.Id == _mainProfile.Id);
         dbUser.Id.Value.Should().Be(_mainUser.Id.Value);
         dbUser.UserName.Should().Be(userName);
-        dbUser.PasswordHash.Should().Be(password);
+        BCrypt.Net.BCrypt.Verify(request.Password, responseUser.Password).Should().BeTrue();
         dbProfile.FullName.Should().Be(_mainProfile.FullName);
         dbProfile.PhoneNumber.Should().Be(_mainProfile.PhoneNumber);
         dbProfile.Address.Should().Be(_mainProfile.Address);
