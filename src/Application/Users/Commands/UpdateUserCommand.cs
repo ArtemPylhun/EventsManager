@@ -5,6 +5,7 @@ using Application.Users.Exceptions;
 using Domain.Profiles;
 using Domain.Users;
 using MediatR;
+using Optional;
 
 namespace Application.Users.Commands;
 
@@ -38,7 +39,7 @@ public class UpdateUserCommandHandler(
                     async p =>
                     {
                         var existingUserWithSameName =
-                            await userQueries.SearchByUserName(request.UserName, cancellationToken);
+                            await CheckDuplicated(userId, request.UserName, cancellationToken);
                         return await existingUserWithSameName.Match(
                             un => Task.FromResult<Result<User, UserException>>(
                                 new UserWithNameAlreadyExistsException(userId)),
@@ -64,8 +65,14 @@ public class UpdateUserCommandHandler(
     {
         try
         {
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
+            string passwordHash = entity.PasswordHash;
+            if (password is not null)
+            {
+                passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
+            }
+
             profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
+
             entity.UpdateDetails(userName, entity.Email, passwordHash);
             return await userRepository.Update(entity, cancellationToken);
         }
@@ -73,5 +80,17 @@ public class UpdateUserCommandHandler(
         {
             return new UserUnknownException(entity.Id, exception);
         }
+    }
+
+    private async Task<Option<User>> CheckDuplicated(
+        UserId userId,
+        string userName,
+        CancellationToken cancellationToken)
+    {
+        var user = await userQueries.SearchByUserName(userName, cancellationToken);
+
+        return user.Match(
+            c => c.Id == userId ? Option.None<User>() : Option.Some(c),
+            Option.None<User>);
     }
 }

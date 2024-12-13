@@ -15,7 +15,8 @@ public record UpdateTagCommand : IRequest<Result<Tag, TagException>>
 }
 
 public class UpdateTagCommandHandler(
-    ITagRepository tagRepository, ITagQueries tagQueries) : IRequestHandler<UpdateTagCommand, Result<Tag, TagException>>
+    ITagRepository tagRepository,
+    ITagQueries tagQueries) : IRequestHandler<UpdateTagCommand, Result<Tag, TagException>>
 {
     public async Task<Result<Tag, TagException>> Handle(
         UpdateTagCommand request,
@@ -27,11 +28,10 @@ public class UpdateTagCommandHandler(
         return await tag.Match(
             async f =>
             {
-                var existingTag = await tagQueries.SearchByTitle(request.Title, cancellationToken);
+                var existingTag = await CheckDuplicated(tagId, request.Title, cancellationToken);
                 return await existingTag.Match(
                     f => Task.FromResult<Result<Tag, TagException>>(new TagAlreadyExistsException(f.Id)),
-                    async () => await UpdateEntity(f,request.Title, cancellationToken));
-                
+                    async () => await UpdateEntity(f, request.Title, cancellationToken));
             },
             () => Task.FromResult<Result<Tag, TagException>>(new TagNotFoundException(tagId)));
     }
@@ -51,5 +51,17 @@ public class UpdateTagCommandHandler(
         {
             return new TagUnknownException(tag.Id, exception);
         }
+    }
+
+    private async Task<Option<Tag>> CheckDuplicated(
+        TagId tagId,
+        string name,
+        CancellationToken cancellationToken)
+    {
+        var category = await tagQueries.SearchByTitle(name, cancellationToken);
+
+        return category.Match(
+            c => c.Id == tagId ? Option.None<Tag>() : Option.Some(c),
+            Option.None<Tag>);
     }
 }

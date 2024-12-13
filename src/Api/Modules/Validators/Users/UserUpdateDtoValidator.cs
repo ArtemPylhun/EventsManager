@@ -12,17 +12,14 @@ public class UserUpdateDtoValidator : AbstractValidator<UserUpdateDto>
             .NotEmpty();
 
         RuleFor(u => u.UserName)
-            .NotEmpty()
             .MinimumLength(3)
             .MaximumLength(255);
 
         RuleFor(u => u.Password)
-            .NotEmpty()
             .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")
             .MinimumLength(8);
 
         RuleFor(u => u.FullName)
-            .NotEmpty()
             .MinimumLength(3)
             .MaximumLength(255);
 
@@ -30,7 +27,6 @@ public class UserUpdateDtoValidator : AbstractValidator<UserUpdateDto>
             .Matches(@"^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d$");
 
         RuleFor(u => u.Address)
-            .NotEmpty()
             .MinimumLength(3)
             .MaximumLength(255);
 
