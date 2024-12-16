@@ -5,6 +5,7 @@ using Application.Users.Exceptions;
 using Domain.Profiles;
 using Domain.Users;
 using MediatR;
+using Optional;
 
 namespace Application.Users.Commands;
 
@@ -22,7 +23,8 @@ public record UpdateUserCommand : IRequest<Result<User, UserException>>
 public class UpdateUserCommandHandler(
     IUserRepository userRepository,
     IUserQueries userQueries,
-    IProfileQueries profileQueries) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
+    IProfileQueries profileQueries,
+    IProfileRepository profileRepository) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
 {
     public async Task<Result<User, UserException>> Handle(UpdateUserCommand request,
         CancellationToken cancellationToken)
@@ -38,7 +40,7 @@ public class UpdateUserCommandHandler(
                     async p =>
                     {
                         var existingUserWithSameName =
-                            await userQueries.SearchByUserName(request.UserName, cancellationToken);
+                            await CheckDuplicated(userId, request.UserName, cancellationToken);
                         return await existingUserWithSameName.Match(
                             un => Task.FromResult<Result<User, UserException>>(
                                 new UserWithNameAlreadyExistsException(userId)),
@@ -64,14 +66,31 @@ public class UpdateUserCommandHandler(
     {
         try
         {
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
-            profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
+            string passwordHash = entity.PasswordHash;
+            if (password is not null)
+            {
+                passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
+            }
+
             entity.UpdateDetails(userName, entity.Email, passwordHash);
+            entity.Profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)
         {
             return new UserUnknownException(entity.Id, exception);
         }
+    }
+
+    private async Task<Option<User>> CheckDuplicated(
+        UserId userId,
+        string userName,
+        CancellationToken cancellationToken)
+    {
+        var user = await userQueries.SearchByUserName(userName, cancellationToken);
+
+        return user.Match(
+            c => c.Id == userId ? Option.None<User>() : Option.Some(c),
+            Option.None<User>);
     }
 }
