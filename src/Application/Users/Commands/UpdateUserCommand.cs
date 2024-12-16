@@ -23,7 +23,8 @@ public record UpdateUserCommand : IRequest<Result<User, UserException>>
 public class UpdateUserCommandHandler(
     IUserRepository userRepository,
     IUserQueries userQueries,
-    IProfileQueries profileQueries) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
+    IProfileQueries profileQueries,
+    IProfileRepository profileRepository) : IRequestHandler<UpdateUserCommand, Result<User, UserException>>
 {
     public async Task<Result<User, UserException>> Handle(UpdateUserCommand request,
         CancellationToken cancellationToken)
@@ -71,9 +72,8 @@ public class UpdateUserCommandHandler(
                 passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
             }
 
-            profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
-
             entity.UpdateDetails(userName, entity.Email, passwordHash);
+            entity.Profile.UpdateDetails(fullName, birthDate, phoneNumber, address);
             return await userRepository.Update(entity, cancellationToken);
         }
         catch (Exception exception)

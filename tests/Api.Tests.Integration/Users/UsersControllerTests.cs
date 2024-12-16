@@ -140,14 +140,18 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         // Arrange
         var userName = "Create User Name";
         var password = "Admin!23";
+        var fullName = "Full Name";
+        var phoneNumber = "123456789";
+        var cityRivne = "city Rivne";
+        var date = DateTime.UtcNow.AddYears(-19);
         var request = new UserUpdateDto(
             Id: _mainUser.Id.Value,
             UserName: userName,
             Password: password,
-            FullName: "Full Name",
-            PhoneNumber: "123456789",
-            Address: "city Rivne",
-            BirthDate: DateTime.UtcNow.AddYears(-19));
+            FullName: fullName,
+            PhoneNumber: phoneNumber,
+            Address: cityRivne,
+            BirthDate: date);
 
         // Act
         var response = await Client.PutAsJsonAsync("users/update", request);
@@ -163,10 +167,10 @@ public class UsersControllerTests : BaseIntegrationTest, IAsyncLifetime
         dbUser.Id.Value.Should().Be(_mainUser.Id.Value);
         dbUser.UserName.Should().Be(userName);
         BCrypt.Net.BCrypt.Verify(request.Password, responseUser.Password).Should().BeTrue();
-        dbProfile.FullName.Should().Be(_mainProfile.FullName);
-        dbProfile.PhoneNumber.Should().Be(_mainProfile.PhoneNumber);
-        dbProfile.Address.Should().Be(_mainProfile.Address);
-        dbProfile.BirthDate.Should().BeSameDateAs(_mainProfile.BirthDate.Value);
+        dbProfile.FullName.Should().Be(fullName);
+        dbProfile.PhoneNumber.Should().Be(phoneNumber);
+        dbProfile.Address.Should().Be(cityRivne);
+        dbProfile.BirthDate.Should().BeSameDateAs(date);
     }
 
     [Fact]
